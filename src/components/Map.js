@@ -11,7 +11,10 @@ import jumpApiCache from "../data/jumpApiCache"
 class Map extends Component { 
   constructor(props) {
     super(props);
-    this.state = {dots: this.geoJsonify(jumpApiCache)};
+    this.state = {
+      dots: this.geoJsonify(jumpApiCache),
+      date: this.datify(jumpApiCache.last_updated)
+    };
   }
 
   componentDidMount() {
@@ -24,9 +27,9 @@ class Map extends Component {
 
     // Create SVG
     var svg = d3.select( ".seattle" )
-        .append( "svg" )
-        .attr( "width", width )
-        .attr( "height", height );
+      .append( "svg" )
+      .attr( "width", width )
+      .attr( "height", height );
 
     // Append empty placeholder g element to the SVG
     // g will contain geometry elements
@@ -34,12 +37,12 @@ class Map extends Component {
 
     // Create a unit projection.
     var projection = d3.geoAlbers()
-    .scale(1)
-    .translate([0, 0]);
+      .scale(1)
+      .translate([0, 0]);
 
     // Create a path generator.
     var path = d3.geoPath()
-    .projection(projection);
+      .projection(projection);
 
     // Compute the bounds of a feature of interest, then derive scale & translate.
     var b = path.bounds(seattleJson),
@@ -48,36 +51,34 @@ class Map extends Component {
 
     // Update the projection to use computed scale & translate.
     projection
-    .scale(s)
-    .translate(t);
+      .scale(s)
+      .translate(t);
 
     // Classic D3... Select non-existent elements, bind the data, append the elements, and apply attributes
     g.selectAll( "path" )
-    .data( seattleJson.features )
-    .enter()
-    .append( "path" )
-    .attr( "fill", "transparent" )
-    .attr( "stroke", "#333")
-    .attr( "d", path );
+      .data( seattleJson.features )
+      .enter()
+      .append( "path" )
+      .attr( "fill", "transparent" )
+      .attr( "stroke", "#333")
+      .attr( "d", path );
 
-    // var coordinates = collection.features.map(feature => {
-    //   console.log(feature)
-    //   return feature.geometry.coordinates
-    // })
     var coordinates = this.state.dots.features.map(feature => {
       console.log(feature)
       return feature.geometry.coordinates
     })
+
     console.log(coordinates)
 
     svg.selectAll("circle")
-		.data(coordinates).enter()
-		.append("circle")
-    .attr("cx", function (d) { console.log(d); console.log(projection(d)); return projection(d)[0]; })
-    .attr("cy", function (d) { return projection(d)[1]; })
-		.attr("r", "2px")
-    .attr("fill", "#777a")
+      .data(coordinates).enter()
+      .append("circle")
+      .attr("cx", function (d) { console.log(d); console.log(projection(d)); return projection(d)[0]; })
+      .attr("cy", function (d) { return projection(d)[1]; })
+      .attr("r", "2px")
+      .attr("fill", "#777a")
     
+    // uncomment this to call API and get updated info!
     this.getPoints()
   }
 
@@ -116,7 +117,10 @@ class Map extends Component {
     // commented out while in test mode
     axios.get('https://sea.jumpbikes.com/opendata/free_bike_status.json')
       .then(response => {
-        this.setState({dots: this.geoJsonify(response.data)})
+        this.setState({
+          dots: this.geoJsonify(response.data),
+          date: this.datify(response.data.last_updated)
+        })
         console.log("updated state!")
       })
       .catch(response => {
@@ -124,10 +128,16 @@ class Map extends Component {
       })
   }
 
+  datify(secondsSinceEpoch) {
+    const date = new Date(secondsSinceEpoch * 1000);
+    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString('en-US');
+  }
+
 
   render() {
     return (
       <div className="map">
+        <h1> {this.state.date} </h1>
         <section className="seattle"></section>
       </div>
     );
