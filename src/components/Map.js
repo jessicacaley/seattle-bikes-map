@@ -1,8 +1,8 @@
 // geojson seattle outline source: https://catalog.data.gov/dataset/042242c7-443e-4c2b-93ed-7dcd2bd6d8f4/resource/77db88b7-20ad-400b-aebb-3400e3042773
 
 import React, {Component} from 'react';
+import ReactDOM from 'react-dom';
 import * as d3 from "d3";
-// commented out while in test mode
 import axios from "axios";
 import seattleJson from "../data/seattleJson"
 import jumpApiCache from "../data/jumpApiCache"
@@ -12,16 +12,47 @@ class Map extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      dots: this.geoJsonify(jumpApiCache),
-      date: this.datify(jumpApiCache.last_updated)
+      dots: null,
+      date: null
     };
   }
 
   componentDidMount() {
-    this.drawMap();
+    this.getPoints();
   }
 
-  drawMap() {      
+  getPoints() {
+    // // real code (API call)
+    // axios.get('https://sea.jumpbikes.com/opendata/free_bike_status.json')
+    //   .then(response => {
+    //     console.log(this.geoJsonify(response.data))
+    //     console.log(this.state.dots)
+    //     this.setState({
+    //       dots: this.geoJsonify(response.data),
+    //       date: this.datify(response.data.last_updated)
+    //     })
+    //     console.log("updated state!")
+    //   })
+    //   .catch(response => {
+    //     console.log(response.errors)
+    //   })
+
+    // test code (cached)
+    this.setState({
+      dots: this.geoJsonify(jumpApiCache),
+      date: this.datify(jumpApiCache.last_updated)
+    })
+
+  }
+
+  componentDidUpdate(previousProps, previousState) {
+    if (this.state.dots !== previousState.dots) {
+      this.drawMap();
+    }
+  }
+
+
+  drawMap() {
     var width = 400;
     var height = 750;
 
@@ -49,6 +80,8 @@ class Map extends Component {
     s = .95 / Math.max((b[1][0] - b[0][0]) / width, (b[1][1] - b[0][1]) / height),
     t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];
 
+    console.log(b)
+
     // Update the projection to use computed scale & translate.
     projection
       .scale(s)
@@ -59,27 +92,28 @@ class Map extends Component {
       .data( seattleJson.features )
       .enter()
       .append( "path" )
-      .attr( "fill", "transparent" )
+      .attr( "fill", "#fff" )
       .attr( "stroke", "#333")
       .attr( "d", path );
 
     var coordinates = this.state.dots.features.map(feature => {
-      console.log(feature)
       return feature.geometry.coordinates
     })
 
-    console.log(coordinates)
+    let projected = []
 
     svg.selectAll("circle")
       .data(coordinates).enter()
       .append("circle")
-      .attr("cx", function (d) { console.log(d); console.log(projection(d)); return projection(d)[0]; })
+      .attr("cx", function (d) { projected.push(projection(d)); return projection(d)[0]; })
       .attr("cy", function (d) { return projection(d)[1]; })
       .attr("r", "2px")
-      .attr("fill", "#777a")
-    
+      .attr("fill", "#444a")
+
     // uncomment this to call API and get updated info!
-    this.getPoints()
+    // this.getPoints()
+
+    console.log(projected)
   }
 
   geoJsonify(response_data) {
@@ -113,20 +147,6 @@ class Map extends Component {
     return collection
   }
   
-  getPoints() {
-    // commented out while in test mode
-    axios.get('https://sea.jumpbikes.com/opendata/free_bike_status.json')
-      .then(response => {
-        this.setState({
-          dots: this.geoJsonify(response.data),
-          date: this.datify(response.data.last_updated)
-        })
-        console.log("updated state!")
-      })
-      .catch(response => {
-        console.log(response.errors)
-      })
-  }
 
   datify(secondsSinceEpoch) {
     const date = new Date(secondsSinceEpoch * 1000);
