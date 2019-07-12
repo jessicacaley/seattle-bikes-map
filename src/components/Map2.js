@@ -50,8 +50,8 @@ class Map2 extends Component {
 
     // const width = 75998.91153031375;
     // const height = 41593.33075809463;
-    const width = 500;
-    const height = 500;
+    const width = 1000;
+    const height = 1000;
 
     var svg = d3.select( 'svg' );
 
@@ -103,13 +103,13 @@ class Map2 extends Component {
     // }, 2000 );
   }
 
-  width = 500;
-  height = 500;
+  width = 1000;
+  height = 1000;
       
   render() {
     return (
       // <svg viewBox="-4611.97848088295 73.26541638819617 71386.93304943081 41666.596174482824" width={this.width} height={this.height} stroke="transparent" strokeLinejoin="round"></svg>
-      <svg width="500" height="500" stroke="transparent" strokeLinejoin="round"></svg>
+      <svg width="1000" height="1000" stroke="transparent" strokeLinejoin="round"></svg>
 
     );
   }

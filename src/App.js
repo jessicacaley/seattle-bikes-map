@@ -7,8 +7,8 @@ import Map2 from './components/Map2'
 function App() {
   return (
     <div className="App">
-      {/* <Map /> */}
-      <Map2 />
+      <Map />
+      {/* <Map2 /> */}
     </div>
   );
 }

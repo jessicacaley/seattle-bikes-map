@@ -7,7 +7,6 @@ import axios from "axios";
 import seattleJson from "../data/seattleJson"
 import jumpApiCache from "../data/jumpApiCache"
 
-
 class Map extends Component { 
   constructor(props) {
     super(props);
@@ -21,21 +20,95 @@ class Map extends Component {
     this.getPoints();
   }
 
+  drawContours(svg, coordinates, projection) {
+    const data = coordinates.map(set => {
+      return {
+        "x": set[0],
+        "y": set[1],
+      }
+    })
+
+    var width = 400;
+    var height = 750;
+
+    // console.log(data)
+
+    // var layer = d3.select(this.getPanes().overlayLayer).append("div")
+    //   .attr("class", "contours");
+    
+    function updateGraph() {
+      var density = svg.append("g");
+      // svg
+      //   .selectAll( 'path' )
+      //   .remove();
+      
+      // svg
+      //   .selectAll( 'circle' )
+      //   .remove();  
+      
+      // svg
+      //   .selectAll( 'circle' )
+      //   .data( data )
+      //   .enter()
+      //   .append( 'circle' )
+      //     .attr( 'cx', function( d ) { console.log(d); return d.x; })
+      //     .attr( 'cy', function( d ) { return d.y; })
+      //     .attr( 'r', 2 )
+      //     .attr( 'stroke', 'none' )
+      //     .attr( 'fill', 'black' );  
+
+      // var contours = svg
+      //   .selectAll( 'path' )
+      //   .data( d3.contourDensity()
+      //     .x( function( d ) { return d.x; } )
+      //     .y( function( d ) { return d.y; } )
+      //     .size( [width, height] )
+      //     .bandwidth( 4 )
+      //     ( data )
+      var contours = density
+      .selectAll( 'path' )
+      .data( d3.contourDensity()
+        // .x( function( d ) { return d.x; } )
+        // .y( function( d ) { return d.y; } )
+        .x( function( d ) { return projection([d.x, d.y])[0]; } )
+        .y( function( d ) { return projection([d.x, d.y])[1]; } )
+        .size( [width, height] )
+        .bandwidth( 4 ) // 4   1-17 big gap from 3 to 4
+        ( data )
+      );
+      
+      contours
+        .enter()
+        .append( "path" )
+        .attr( "d", d3.geoPath() )
+        .attr( 'fill', '#300')
+        .attr( 'opacity', '0.1');
+    }
+
+    // updateData();
+    updateGraph();
+
+    // setInterval( function() {
+    //   updateData();
+    //   updateGraph();
+    // }, 2000 );
+  }
+
   getPoints() {
-    // // real code (API call)
-    // axios.get('https://sea.jumpbikes.com/opendata/free_bike_status.json')
-    //   .then(response => {
-    //     console.log(this.geoJsonify(response.data))
-    //     console.log(this.state.dots)
-    //     this.setState({
-    //       dots: this.geoJsonify(response.data),
-    //       date: this.datify(response.data.last_updated)
-    //     })
-    //     console.log("updated state!")
-    //   })
-    //   .catch(response => {
-    //     console.log(response.errors)
-    //   })
+    // real code (API call)
+    axios.get('https://sea.jumpbikes.com/opendata/free_bike_status.json')
+      .then(response => {
+        console.log(this.geoJsonify(response.data))
+        console.log(this.state.dots)
+        this.setState({
+          dots: this.geoJsonify(response.data),
+          date: this.datify(response.data.last_updated)
+        })
+        console.log("updated state!")
+      })
+      .catch(response => {
+        console.log(response.errors)
+      })
 
     // test code (cached)
     this.setState({
@@ -92,28 +165,28 @@ class Map extends Component {
       .data( seattleJson.features )
       .enter()
       .append( "path" )
-      .attr( "fill", "#fff" )
+      // .attr( "fill", "#fff" )
+      .attr( "fill", "transparent" )
       .attr( "stroke", "#333")
       .attr( "d", path );
 
     var coordinates = this.state.dots.features.map(feature => {
-      return feature.geometry.coordinates
+      return feature.geometry.coordinates;
     })
-
-    let projected = []
 
     svg.selectAll("circle")
       .data(coordinates).enter()
       .append("circle")
-      .attr("cx", function (d) { projected.push(projection(d)); return projection(d)[0]; })
+      .attr("cx", function (d) { return projection(d)[0]; })
       .attr("cy", function (d) { return projection(d)[1]; })
       .attr("r", "2px")
-      .attr("fill", "#444a")
+      // .attr("fill", "#444a")
+      .attr("fill", "transparent");
 
     // uncomment this to call API and get updated info!
     // this.getPoints()
 
-    console.log(projected)
+    this.drawContours(svg, coordinates, projection);
   }
 
   geoJsonify(response_data) {
