@@ -6,6 +6,8 @@ import * as d3 from "d3";
 import axios from "axios";
 import seattleJson from "../data/seattleJson"
 import jumpApiCache from "../data/jumpApiCache"
+import limeApi from "../data/limeApi"
+
 
 class Map extends Component { 
   constructor(props) {
@@ -73,7 +75,7 @@ class Map extends Component {
         .x( function( d ) { return projection([d.x, d.y])[0]; } )
         .y( function( d ) { return projection([d.x, d.y])[1]; } )
         .size( [width, height] )
-        .bandwidth( 4 ) // 4   1-17 big gap from 3 to 4
+        .bandwidth( 4 ) // 4, 7, 10,  1-17 big gap from 3 to 4
         ( data )
       );
       
@@ -81,7 +83,7 @@ class Map extends Component {
         .enter()
         .append( "path" )
         .attr( "d", d3.geoPath() )
-        .attr( 'fill', '#300')
+        .attr( 'fill', '#000')
         .attr( 'opacity', '0.1');
     }
 
@@ -114,11 +116,16 @@ class Map extends Component {
     this.setState({
       dots: this.geoJsonify(jumpApiCache),
       date: this.datify(jumpApiCache.last_updated)
-    })
+    });
 
+    // // so far, i've only gotten lime to return a concentrated cluster...
+    // this.setState({
+    //   dots: limeApi,
+    // });
   }
 
   componentDidUpdate(previousProps, previousState) {
+    
     if (this.state.dots !== previousState.dots) {
       this.drawMap();
     }
@@ -149,7 +156,7 @@ class Map extends Component {
       .projection(projection);
 
     // Compute the bounds of a feature of interest, then derive scale & translate.
-    var b = path.bounds(seattleJson),
+    var b = path.bounds(seattleJson), // outline of seattle
     s = .95 / Math.max((b[1][0] - b[0][0]) / width, (b[1][1] - b[0][1]) / height),
     t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];
 
@@ -162,26 +169,31 @@ class Map extends Component {
 
     // Classic D3... Select non-existent elements, bind the data, append the elements, and apply attributes
     g.selectAll( "path" )
-      .data( seattleJson.features )
+      .data( seattleJson.features ) // outline of seattle
       .enter()
       .append( "path" )
       // .attr( "fill", "#fff" )
-      .attr( "fill", "transparent" )
+      // .attr( "fill", "transparent" )
+      .attr( "fill", "rgba(230, 230, 230, 1)" )
       .attr( "stroke", "#333")
       .attr( "d", path );
+
+    console.log(this.state.dots)
+
 
     var coordinates = this.state.dots.features.map(feature => {
       return feature.geometry.coordinates;
     })
 
-    svg.selectAll("circle")
-      .data(coordinates).enter()
-      .append("circle")
-      .attr("cx", function (d) { return projection(d)[0]; })
-      .attr("cy", function (d) { return projection(d)[1]; })
-      .attr("r", "2px")
-      // .attr("fill", "#444a")
-      .attr("fill", "transparent");
+
+    // svg.selectAll("circle")
+    //   .data(coordinates).enter()
+    //   .append("circle")
+    //   .attr("cx", function (d) { return projection(d)[0]; })
+    //   .attr("cy", function (d) { return projection(d)[1]; })
+    //   .attr("r", "2px")
+    //   // .attr("fill", "#444a")
+    //   .attr("fill", "red");
 
     // uncomment this to call API and get updated info!
     // this.getPoints()
