@@ -27,7 +27,7 @@ class Map extends Component {
       if(i === (fakeAPI.length - 1)){
         clearInterval(intervalId);
       }
-      console.log(i);
+      console.log(`map ${i+1}/${fakeAPI.length}`)
       this.getPoints(i);
       i++;
     }, 1000);
@@ -59,16 +59,26 @@ class Map extends Component {
       .x( function( d ) { return projection([d.x, d.y])[0]; } )
       .y( function( d ) { return projection([d.x, d.y])[1]; } )
       .size( [width, height] )
-      .bandwidth( 4 ) // 4, 7, 10,  1-17 big gap from 3 to 4
+      .bandwidth( 4 ) // 4, 6, 7 is distorting, 10, 14, 16 1-17 big gap from 3 to 4
       ( data )
     );
+
+    // https://github.com/d3/d3-scale-chromatic#interpolatePiYG
+    var color = d3.scaleSequential(d3.interpolatePuBu)
+    .domain([0, .04]); // Points per square pixel.
     
     contours
       .enter()
       .append( "path" )
       .attr( "d", d3.geoPath() )
-      .attr( 'fill', 'red')
-      .attr( 'opacity', '0.1');
+      .attr( 'fill', 'white')
+      // .attr( 'stroke', 'black')
+      // .attr("stroke-linejoin", "round")
+      // .attr("stroke-width", 0.1)
+      .attr( 'opacity', '.5')
+      .attr("fill", function(d) { return color(d.value); })
+      .attr("d", d3.geoPath());
+      
 
    
   }
@@ -131,8 +141,6 @@ class Map extends Component {
     s = .95 / Math.max((b[1][0] - b[0][0]) / width, (b[1][1] - b[0][1]) / height),
     t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];
 
-    console.log(b)
-
     // Update the projection to use computed scale & translate.
     projection
       .scale(s)
@@ -145,26 +153,26 @@ class Map extends Component {
       .append( "path" )
       // .attr( "fill", "#fff" )
       // .attr( "fill", "transparent" )
-      .attr( "fill", "rgba(230, 230, 230, 1)" )
-      .attr( "stroke", "#333")
+      // .attr( "fill", "rgba(230, 230, 230, 1)" )
+      .attr( "fill", "white" )
+      // .attr( "stroke", "#333")
+      .attr( "stroke", "grey")      
+      .attr("stroke-width", 2)
       .attr( "d", path );
-
-    console.log(this.state.dots)
-
 
     var coordinates = this.state.dots.features.map(feature => {
       return feature.geometry.coordinates;
     })
 
 
-    svg.selectAll("circle")
-      .data(coordinates).enter()
-      .append("circle")
-      .attr("cx", function (d) { return projection(d)[0]; })
-      .attr("cy", function (d) { return projection(d)[1]; })
-      .attr("r", "2px")
-      // .attr("fill", "#444a")
-      .attr("fill", "lightgrey");
+    // svg.selectAll("circle")
+    //   .data(coordinates).enter()
+    //   .append("circle")
+    //   .attr("cx", function (d) { return projection(d)[0]; })
+    //   .attr("cy", function (d) { return projection(d)[1]; })
+    //   .attr("r", "2px")
+    //   .attr("fill", "#eee")
+    //   // .attr("fill", "lightgrey");
 
     // uncomment this to call API and get updated info!
     // this.getPoints()
