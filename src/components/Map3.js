@@ -20,10 +20,22 @@ class Map extends Component {
   }
 
   componentDidMount() {
-    this.getPoints("test");
+    // this.getPoints(0);
 
-
-    //  setInterval( this.getPoints("api"), 2000 );
+    var i = 0;
+    var intervalId = setInterval(() => {
+      if(i === (fakeAPI.length - 1)){
+        clearInterval(intervalId);
+      }
+      console.log(i);
+      this.getPoints(i);
+      i++;
+    }, 1000);
+    
+    
+    // this.drawMap();
+    // let i = 0;
+    //  setInterval() this.getPoints(i++), 5000 );
   }
 
   drawContours(svg, coordinates, projection) {
@@ -55,39 +67,27 @@ class Map extends Component {
       .enter()
       .append( "path" )
       .attr( "d", d3.geoPath() )
-      .attr( 'fill', 'black')
+      .attr( 'fill', 'red')
       .attr( 'opacity', '0.1');
 
    
   }
 
-  getPoints(from) {
-    // real code (API call)
-    if(from === "axios") {
-      axios.get('https://sea.jumpbikes.com/opendata/free_bike_status.json')
-      .then(response => {
-        console.log(this.geoJsonify(response.data))
-        console.log(this.state.dots)
-        this.setState({
-          dots: this.geoJsonify(response.data),
-          date: this.datify(response.data.last_updated)
-        })
-        console.log("updated state!")
-      })
-      .catch(response => {
-        console.log(response.errors)
-      })
-    } else if(from === "test") {
-      this.setState({
-        dots: this.geoJsonify(jumpApiCache),
-        date: this.datify(jumpApiCache.last_updated)
-      });
-    } else if(from === "lime") {
-      // so far, i've only gotten lime to return a concentrated cluster...
-      this.setState({
-        dots: limeApi,
-      });
-    }
+  getPoints(i) {
+    // let data = fakeAPI[0];
+    // let counter = 0;
+    // let timer = setInterval(function() {
+    //   let data = fakeAPI[counter];
+    //   counter++;
+    //   if(counter === fakeAPI.length){
+    //     clearInterval(timer);
+    //   }
+    // }, 5000)
+    const data = fakeAPI[i]
+    this.setState({
+      dots: data,
+      date: this.datify(data.features[0].properties.time)
+    });
   }
 
   componentDidUpdate(previousProps, previousState) {
@@ -102,6 +102,8 @@ class Map extends Component {
 
 
   drawMap() {
+    d3.selectAll("svg").remove();
+
     var width = 400;
     var height = 750;
 
@@ -185,7 +187,10 @@ class Map extends Component {
           'time': time,
           'bike_id': bike.bike_id,
           'name': bike.name,
+          'is_reserved': bike.is_reserved,
+          'is_disabled': bike.is_disabled,
           'jump_ebike_battery_level': bike.jump_ebike_battery_level,
+          'jump_vehicle_type': bike.jump_vehicle_type
         }
       };
     });

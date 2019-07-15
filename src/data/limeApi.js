@@ -1560,8 +1560,6 @@ let limeApi = {
 const bikes = limeApi.data.attributes.bikes
 
 const jsonFeatures = bikes.map(bike => {
-  console.log(bike)
-
   return {
     'type': 'Feature',
     'geometry': {
