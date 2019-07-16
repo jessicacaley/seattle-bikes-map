@@ -10,8 +10,6 @@ function App() {
   return (
     <div className="App">
       {/* <Map /> */}
-      {/* <Map /> */}
-
       {/* <Map2 /> */}
       <Map3 />
     </div>

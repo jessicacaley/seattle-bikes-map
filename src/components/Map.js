@@ -20,7 +20,7 @@ class Map extends Component {
   }
 
   componentDidMount() {
-    this.getPoints("test");
+    this.getPoints("axios");
 
 
     //  setInterval( this.getPoints("api"), 2000 );

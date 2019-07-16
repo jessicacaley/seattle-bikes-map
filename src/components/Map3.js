@@ -15,27 +15,24 @@ class Map extends Component {
     super(props);
     this.state = {
       dots: null,
-      date: null
+      date: null,
     };
   }
 
-  componentDidMount() {
-    // this.getPoints(0);
+  width = 800;
+  height = 750;
 
+  componentDidMount() {
+    // Every second, render the next map.
     var i = 0;
     var intervalId = setInterval(() => {
       if(i === (fakeAPI.length - 1)){
         clearInterval(intervalId);
       }
-      console.log(`map ${i+1}/${fakeAPI.length}`)
+      console.log(`Rendering map #${i+1}/${fakeAPI.length}...`)
       this.getPoints(i);
       i++;
-    }, 1000);
-    
-    
-    // this.drawMap();
-    // let i = 0;
-    //  setInterval() this.getPoints(i++), 5000 );
+    }, 1500);
   }
 
   drawContours(svg, coordinates, projection) {
@@ -46,26 +43,21 @@ class Map extends Component {
       }
     })
 
-    var width = 400;
-    var height = 750;
-
     var density = svg.append("g");
     
     var contours = density
-    .selectAll( 'path' )
-    .data( d3.contourDensity()
-      // .x( function( d ) { return d.x; } )
-      // .y( function( d ) { return d.y; } )
-      .x( function( d ) { return projection([d.x, d.y])[0]; } )
-      .y( function( d ) { return projection([d.x, d.y])[1]; } )
-      .size( [width, height] )
-      .bandwidth( 4 ) // 4, 6, 7 is distorting, 10, 14, 16 1-17 big gap from 3 to 4
-      ( data )
-    );
+      .selectAll( 'path' )
+      .data( d3.contourDensity()
+        .x( function( d ) { return projection([d.x, d.y])[0]; } )
+        .y( function( d ) { return projection([d.x, d.y])[1]; } )
+        .size( [this.width, this.height] )
+        .bandwidth( 6 ) // 4, 6, 7 is distorting, 10 (last with lines), 14, 16 1-17 big gap from 3 to 4
+        ( data )
+      );
 
     // https://github.com/d3/d3-scale-chromatic#interpolatePiYG
-    var color = d3.scaleSequential(d3.interpolatePuBu)
-    .domain([0, .04]); // Points per square pixel.
+    var color = d3.scaleSequential(d3.interpolateYlGn)
+     .domain([0, .06]); // Points per square pixel.
     
     contours
       .enter()
@@ -75,24 +67,12 @@ class Map extends Component {
       // .attr( 'stroke', 'black')
       // .attr("stroke-linejoin", "round")
       // .attr("stroke-width", 0.1)
-      .attr( 'opacity', '.5')
+      .attr( 'opacity', '.8')
       .attr("fill", function(d) { return color(d.value); })
       .attr("d", d3.geoPath());
-      
-
-   
   }
 
   getPoints(i) {
-    // let data = fakeAPI[0];
-    // let counter = 0;
-    // let timer = setInterval(function() {
-    //   let data = fakeAPI[counter];
-    //   counter++;
-    //   if(counter === fakeAPI.length){
-    //     clearInterval(timer);
-    //   }
-    // }, 5000)
     const data = fakeAPI[i]
     this.setState({
       dots: data,
@@ -106,22 +86,14 @@ class Map extends Component {
     }
   }
 
-  // resetMap() {
-    
-  // }
-
-
   drawMap() {
     d3.selectAll("svg").remove();
-
-    var width = 400;
-    var height = 750;
 
     // Create SVG
     var svg = d3.select( ".seattle" )
       .append( "svg" )
-      .attr( "width", width )
-      .attr( "height", height );
+      .attr( "width", this.width )
+      .attr( "height", this.height );
 
     // Append empty placeholder g element to the SVG
     // g will contain geometry elements
@@ -138,8 +110,8 @@ class Map extends Component {
 
     // Compute the bounds of a feature of interest, then derive scale & translate.
     var b = path.bounds(seattleJson), // outline of seattle
-    s = .95 / Math.max((b[1][0] - b[0][0]) / width, (b[1][1] - b[0][1]) / height),
-    t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];
+    s = .95 / Math.max((b[1][0] - b[0][0]) / this.width, (b[1][1] - b[0][1]) / this.height),
+    t = [(this.width - s * (b[1][0] + b[0][0])) / 2, (this.height - s * (b[1][1] + b[0][1])) / 2];
 
     // Update the projection to use computed scale & translate.
     projection
@@ -151,11 +123,7 @@ class Map extends Component {
       .data( seattleJson.features ) // outline of seattle
       .enter()
       .append( "path" )
-      // .attr( "fill", "#fff" )
-      // .attr( "fill", "transparent" )
-      // .attr( "fill", "rgba(230, 230, 230, 1)" )
-      .attr( "fill", "white" )
-      // .attr( "stroke", "#333")
+      .attr( "fill", "#F7FCE8" )
       .attr( "stroke", "grey")      
       .attr("stroke-width", 2)
       .attr( "d", path );
@@ -164,57 +132,121 @@ class Map extends Component {
       return feature.geometry.coordinates;
     })
 
-
-    // svg.selectAll("circle")
-    //   .data(coordinates).enter()
-    //   .append("circle")
-    //   .attr("cx", function (d) { return projection(d)[0]; })
-    //   .attr("cy", function (d) { return projection(d)[1]; })
-    //   .attr("r", "2px")
-    //   .attr("fill", "#eee")
-    //   // .attr("fill", "lightgrey");
-
-    // uncomment this to call API and get updated info!
-    // this.getPoints()
-
-    this.drawContours(svg, coordinates, projection);
+    this.setState({
+      coordinates: coordinates,
+      projection: projection,
+      svg: svg
+    });
+    
+    // this.drawContours(svg, coordinates, projection);
+    this.drawDots(svg, coordinates, projection);
   }
 
-  geoJsonify(response_data) {
-    // console.log(response.data)
-    const time = response_data.last_updated
+  drawDots(svg, coordinates, projection) {
+    const circleColorScale = d3.scaleLinear().domain([0,100]).range(['#ff1612', '#12ff22']);
+    const dots = this.state.dots
 
-    const jsonFeatures = response_data.data.bikes.map(bike => {
-      return {
-        'type': 'Feature',
-        'geometry': {
-          'type': 'Point',
-          'coordinates': [bike.lon, bike.lat]
-        },
-        'properties': {
-          'time': time,
-          'bike_id': bike.bike_id,
-          'name': bike.name,
-          'is_reserved': bike.is_reserved,
-          'is_disabled': bike.is_disabled,
-          'jump_ebike_battery_level': bike.jump_ebike_battery_level,
-          'jump_vehicle_type': bike.jump_vehicle_type
-        }
-      };
-    });
+    function handleMouseOver(d, i) {
+      const circle = d3.select(this)
+        // .attr("fill", "orange")
+        .attr("r", "6px");
+      
+      // console.log(d)
 
-    const collection = {
-      'type': 'FeatureCollection',
-      'features': jsonFeatures
+      const that = this;
+
+      svg.append("text")
+        .attr("id", "i" + (this.getAttribute("name"))) // Create an id for text so we can select it later for removing on mouseout
+        .attr("x", function() { return 100; })
+        .attr("y", function() { return 100; })
+        .text(function() {
+          // console.log(circle._groups[0][0].attributes[6].value ) // this is hacky but works..
+          return that.getAttribute("name");  // Value of the text
+        });
     }
 
-    return collection
+    function handleMouseOut(d, i) {
+      const circle = d3.select(this)
+        // .attr("fill", function(d, i) { return circleColorScale(parseInt(dots.features[i].properties.jump_ebike_battery_level.slice(0, -1))) })
+        .attr("r", "2px")
+        
+      d3.select("#i" + `${this.getAttribute("name")}`).remove();  // Remove text location
+    }
+
+    function handleMouseClick(d, i) {
+      const circle = d3.select(this)
+
+      const that = this
+      // const dots = this.state.dots
+
+      console.log("click!")
+      d3.select("#description").remove();  // Remove text location
+
+      svg.append("text")
+        .attr("id", "description") // Create an id for text so we can select it later for removing on mouseout
+        .attr("x", function() { return 700; })
+        .attr("y", function() { return 350; })
+        .text(function() {
+          console.log(this)
+          return dots.features[i].properties.jump_ebike_battery_level;  // Value of the text
+        });
+    }
+    svg.selectAll("circle")
+      .data(coordinates).enter()
+      .append("circle")
+      .attr("cx", function (d) { return projection(d)[0]; })
+      .attr("cy", function (d) { return projection(d)[1]; })
+      .attr("r", "2px")
+      // .attr("fill", "transparent")
+      .attr("fill", function(d, i) { 
+        const percentage = parseInt(dots.features[i].properties.jump_ebike_battery_level.slice(0, -1))
+        return circleColorScale(percentage) 
+      })
+      .attr("stroke", "black")
+      .attr("stroke-width", 0.1)
+      .on('mouseover', handleMouseOver)
+      .on('mouseout', handleMouseOut)
+      .on('click', handleMouseClick)
+      .attr('name', function(d, i) {return dots.features[i].properties.name})
   }
+
+
+  // // not needed here, but keeping the code for reference for how to parse API
+  // geoJsonify(response_data) {
+  //   // console.log(response.data)
+  //   const time = response_data.last_updated
+
+  //   const jsonFeatures = response_data.data.bikes.map(bike => {
+  //     return {
+  //       'type': 'Feature',
+  //       'geometry': {
+  //         'type': 'Point',
+  //         'coordinates': [bike.lon, bike.lat]
+  //       },
+  //       'properties': {
+  //         'time': time,
+  //         'bike_id': bike.bike_id,
+  //         'name': bike.name,
+  //         'is_reserved': bike.is_reserved,
+  //         'is_disabled': bike.is_disabled,
+  //         'jump_ebike_battery_level': bike.jump_ebike_battery_level,
+  //         'jump_vehicle_type': bike.jump_vehicle_type
+  //       }
+  //     };
+  //   });
+
+  //   const collection = {
+  //     'type': 'FeatureCollection',
+  //     'features': jsonFeatures
+  //   }
+
+  //   return collection
+  // }
   
 
   datify(secondsSinceEpoch) {
     const date = new Date(secondsSinceEpoch * 1000);
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString('en-US');
+    return `${date.toLocaleDateString()} || ${date.toLocaleTimeString('en-US')}`;
   }
 
 
