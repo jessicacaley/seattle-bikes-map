@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom';
 import * as d3 from "d3";
 import axios from "axios";
 import seattleJson from "../data/seattleJson"
+// import neighborhoods from "../data/seattle-neighborhoods"
 import jumpApiCache from "../data/jumpApiCache"
 import limeApi from "../data/limeApi"
 import fakeAPI from "../data/fakeAPI"
@@ -51,7 +52,7 @@ class Map extends Component {
         .x( function( d ) { return projection([d.x, d.y])[0]; } )
         .y( function( d ) { return projection([d.x, d.y])[1]; } )
         .size( [this.width, this.height] )
-        .bandwidth( 6 ) // 4, 6, 7 is distorting, 10 (last with lines), 14, 16 1-17 big gap from 3 to 4
+        .bandwidth( 4 ) // 4, 6, 7 is distorting, 10 (last with lines), 14, 16 1-17 big gap from 3 to 4
         ( data )
       );
 
@@ -163,6 +164,7 @@ class Map extends Component {
           // console.log(circle._groups[0][0].attributes[6].value ) // this is hacky but works..
           return that.getAttribute("name");  // Value of the text
         });
+
     }
 
     function handleMouseOut(d, i) {
@@ -179,7 +181,7 @@ class Map extends Component {
       const that = this
       // const dots = this.state.dots
 
-      console.log("click!")
+      // console.log("click!")
       d3.select("#description").remove();  // Remove text location
 
       svg.append("text")
@@ -187,7 +189,7 @@ class Map extends Component {
         .attr("x", function() { return 700; })
         .attr("y", function() { return 350; })
         .text(function() {
-          console.log(this)
+          // console.log(this)
           return dots.features[i].properties.jump_ebike_battery_level;  // Value of the text
         });
     }
@@ -208,7 +210,23 @@ class Map extends Component {
       .on('mouseout', handleMouseOut)
       .on('click', handleMouseClick)
       .attr('name', function(d, i) {return dots.features[i].properties.name})
+
+    // this.calculateDots(svg);
+    
   }
+
+  // calculateDots(svg) {
+  //   let number = 0;
+  //   svg.selectAll("circle")
+  //     .attr("test", function(d, i) {
+  //       console.log(d)
+  //       console.log(i)
+  //       number += 1
+  //     })
+
+  //   console.log(number)
+
+  // }
 
 
   // // not needed here, but keeping the code for reference for how to parse API
