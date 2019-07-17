@@ -17,6 +17,8 @@ class Map extends Component {
     this.state = {
       dots: null,
       date: null,
+      mapType: "dots",
+      pause: false
     };
   }
 
@@ -24,10 +26,16 @@ class Map extends Component {
   height = 750;
 
   componentDidMount() {
+    this.iterateOverTime()
+  }
+
+  iterateOverTime = () => {
+    this.setState({pause: false})
+
     // Every second, render the next map.
     var i = 0;
     var intervalId = setInterval(() => {
-      if(i === (fakeAPI.length - 1)){
+      if(i === (fakeAPI.length - 1) || this.state.pause ){
         clearInterval(intervalId);
       }
       console.log(`Rendering map #${i+1}/${fakeAPI.length}...`)
@@ -36,7 +44,7 @@ class Map extends Component {
     }, 1500);
   }
 
-  drawContours(svg, coordinates, projection) {
+  drawContours = (svg, coordinates, projection) => {
     const data = coordinates.map(set => {
       return {
         "x": set[0],
@@ -73,7 +81,7 @@ class Map extends Component {
       .attr("d", d3.geoPath());
   }
 
-  getPoints(i) {
+  getPoints = (i) => {
     const data = fakeAPI[i]
     this.setState({
       dots: data,
@@ -82,12 +90,12 @@ class Map extends Component {
   }
 
   componentDidUpdate(previousProps, previousState) {
-    if (this.state.dots !== previousState.dots) {  
+    if ((this.state.dots !== previousState.dots) || (this.state.mapType !== previousState.mapType)) {  
       this.drawMap();
     }
   }
 
-  drawMap() {
+  drawMap = () => {
     d3.selectAll("svg").remove();
 
     // Create SVG
@@ -139,11 +147,14 @@ class Map extends Component {
       svg: svg
     });
     
-    // this.drawContours(svg, coordinates, projection);
-    this.drawDots(svg, coordinates, projection);
+    if(this.state.mapType === "density") {
+      this.drawContours(svg, coordinates, projection);
+    } else {
+      this.drawDots(svg, coordinates, projection);
+    }
   }
 
-  drawDots(svg, coordinates, projection) {
+  drawDots = (svg, coordinates, projection) => {
     const circleColorScale = d3.scaleLinear().domain([0,100]).range(['#ff1612', '#12ff22']);
     const dots = this.state.dots
 
@@ -262,15 +273,31 @@ class Map extends Component {
   // }
   
 
-  datify(secondsSinceEpoch) {
+  datify = (secondsSinceEpoch) => {
     const date = new Date(secondsSinceEpoch * 1000);
     return `${date.toLocaleDateString()} || ${date.toLocaleTimeString('en-US')}`;
   }
 
+  clickDotsButton = () => {
+    this.setState({mapType: "dots"})
+  }
+
+  clickDensityButton = () => {
+    this.setState({mapType: "density"})
+  }
+
+  pause = () => {
+    this.setState({pause: true})
+  }
 
   render() {
     return (
       <div className="map">
+        <button onClick={this.clickDotsButton}>Dots</button>
+        <button onClick={this.clickDensityButton}>Density</button>
+        <button onClick={this.iterateOverTime}>Replay</button>
+        <button onClick={this.pause}>Pause</button>
+
         <h1> {this.state.date} </h1>
         <section className="seattle"></section>
       </div>

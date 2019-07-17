@@ -10,6 +10,7 @@ import jumpApiCache from "../data/jumpApiCache"
 import limeApi from "../data/limeApi"
 import fakeAPI from "../data/fakeAPI"
 
+// would be cool to do this one as a comparison to average amount or density in each neighborhood instead of compared to other neighborhoods
 
 class Map extends Component { 
   constructor(props) {
@@ -25,17 +26,17 @@ class Map extends Component {
 
   componentDidMount() {
     // Every second, render the next map.
-    // var i = 0;
-    // var intervalId = setInterval(() => {
-    //   if(i === (fakeAPI.length - 1)){
-    //     clearInterval(intervalId);
-    //   }
-    //   console.log(`Rendering map #${i+1}/${fakeAPI.length}...`)
-    //   this.getPoints(i);
-    //   i++;
-    // }, 1500);
+    var i = 0;
+    var intervalId = setInterval(() => {
+      if(i === (fakeAPI.length - 1)){
+        clearInterval(intervalId);
+      }
+      console.log(`Rendering map #${i+1}/${fakeAPI.length}...`)
+      this.getPoints(i);
+      i++;
+    }, 1500);
 
-    this.getPoints(5)
+    // this.getPoints(i)
   }
 
   drawContours(svg, coordinates, projection) {
@@ -79,7 +80,8 @@ class Map extends Component {
     const data = fakeAPI[i]
     this.setState({
       dots: data,
-      date: this.datify(data.features[0].properties.time)
+      date: this.datify(data.features[0].properties.time),
+      i: i
     });
   }
 
@@ -122,13 +124,29 @@ class Map extends Component {
       .translate(t);
     
     function handleMouseOver() {
-      const hood = d3.select(this)
-        .attr("fill", "black");
+      // const hood = d3.select(this)
+
+      const that = this
+
+      svg.append("text")
+        .attr("id", "i" + (that.getAttribute("name")).split(" ").join("").split(":").join("")) // Create an id for text so we can select it later for removing on mouseout
+        .attr("x", function() { console.log(that.getAttribute("name")); return 100; })
+        .attr("y", function() { return 100; })
+        .text(function(d, i) {
+          
+          return that.getAttribute("name");  // Value of the text
+
+        });
     } 
 
     function handleMouseOut() {
       const hood = d3.select(this)
-        .attr("fill", "#F7FCE8");
+        // .attr("fill", "#F7FCE8");
+
+    
+      console.log(this)
+      d3.select("#i" + `${this.getAttribute("name").split(" ").join("").split(":").join("")}`).remove();  // Remove text location
+
     } 
 
 
@@ -136,27 +154,73 @@ class Map extends Component {
     let neighborhoodBikeCount = {}
     neighborhoods.features.forEach((feature, i) => {
       let bikeCount = 0
-      const hood = neighborhoods.features[i].geometry.coordinates[0]
-      // const point = fakeAPI[0].features[1000].geometry.coordinates
-      const points = fakeAPI[5].features
-      // console.log(hood)
-      const point = fakeAPI[5].features[1565].geometry.coordinates
-      // console.log(hood[0].length)
-      points.forEach(point => {
-        if(d3.polygonContains(hood, point.geometry.coordinates)) {
-          console.log("TRUE")
-          bikeCount += 1
+
+      if (feature.geometry.type === "Polygon") {
+        if (!neighborhoods.features[i].geometry.coordinates.length === 1) {
+          console.log("here!")
         }
-      })
 
-      // let neighborhoodBikeCount = {}
-      neighborhoodBikeCount[feature.id] = bikeCount / feature.properties.area;
+        const hood = neighborhoods.features[i].geometry.coordinates[0]
 
-      // neighborhoodsBikeCount.push(neighborhoodBikeCount)
+        const points = fakeAPI[this.state.i].features
+        
+        points.forEach(point => {
+          if(d3.polygonContains(hood, point.geometry.coordinates)) {
+            // console.log("TRUE")
+            bikeCount += 1
+          }
+        })
 
-      console.log(neighborhoodBikeCount)
-      
-      // console.log(d3.polygonContains(hood, point))
+        neighborhoodBikeCount[feature.id] = bikeCount / feature.properties.area;
+
+        // console.log(neighborhoodBikeCount)
+      } else {
+        feature.geometry.coordinates.forEach(coordinate => {
+          // console.log(coordinate)
+          if (coordinate.length === 1) {
+            const hood = coordinate[0]
+
+            const points = fakeAPI[this.state.i].features
+            
+            points.forEach(point => {
+              if(d3.polygonContains(hood, point.geometry.coordinates)) {
+                // console.log("TRUE")
+                bikeCount += 1
+              }
+            })
+            if(neighborhoodBikeCount[feature.id]) {
+              neighborhoodBikeCount[feature.id] += bikeCount / feature.properties.area;
+            } else {
+              neighborhoodBikeCount[feature.id] = bikeCount / feature.properties.area;
+            }
+  
+            // console.log(neighborhoodBikeCount)
+          } else {
+            coordinate.forEach(set => {
+              console.log("here!")
+              const hood = set
+
+              const points = fakeAPI[this.state.i].features
+              
+              points.forEach(point => {
+                if(d3.polygonContains(hood, point.geometry.coordinates)) {
+                  // console.log("TRUE")
+                  bikeCount += 1
+                }
+              })
+              if(neighborhoodBikeCount[feature.id]) {
+                neighborhoodBikeCount[feature.id] += bikeCount / feature.properties.area;
+              } else {
+                neighborhoodBikeCount[feature.id] = bikeCount / feature.properties.area;
+              }
+    
+              // console.log(neighborhoodBikeCount)
+            })
+          }
+          
+        })
+      }
+        
     })
 
     const densityValues = Object.values(neighborhoodBikeCount);
@@ -164,10 +228,10 @@ class Map extends Component {
     const maxDensity = Math.max(...densityValues)
     const minDensity = Math.min(...densityValues)
 
-    console.log(maxDensity, minDensity)
+    // console.log(maxDensity, minDensity)
 
     // var colorScale = d3.scaleLinear().domain([0,112703512.412]).range(['beige', 'red']);
-    var colorScale = d3.scaleLinear().domain([minDensity, maxDensity]).range(['white', 'red']);
+    var colorScale = d3.scaleLinear().domain([minDensity, maxDensity]).range(['white', 'blue']);
 
       
     // Classic D3... Select non-existent elements, bind the data, append the elements, and apply attributes
@@ -177,18 +241,16 @@ class Map extends Component {
       .append( "path" )
       // .attr( "fill", "#F7FCE8" )
       .attr( "fill", function(d, i) {
-        console.log(d.id)
-        console.log(neighborhoodBikeCount[d.id])
+        // console.log(d.id)
+        // console.log(neighborhoodBikeCount[d.id])
         // return colorScale(d.properties.area);
         return colorScale(neighborhoodBikeCount[d.id]);
 
       } )
-      .attr("num-of-bikes", function(d,i) {
-        
-      })
       .attr( "stroke", "grey")      
       .attr("stroke-width", 1)
       .attr( "d", path )
+      .attr("name", function(d) {return d.id})
       .on('mouseover', handleMouseOver)
       .on('mouseout', handleMouseOut);
 
@@ -245,7 +307,7 @@ class Map extends Component {
       const that = this
       // const dots = this.state.dots
 
-      console.log("click!")
+      // console.log("click!")
       d3.select("#description").remove();  // Remove text location
 
       svg.append("text")
@@ -253,7 +315,7 @@ class Map extends Component {
         .attr("x", function() { return 700; })
         .attr("y", function() { return 350; })
         .text(function() {
-          console.log(this)
+          // console.log(this)
           return dots.features[i].properties.jump_ebike_battery_level;  // Value of the text
         });
     }
