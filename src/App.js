@@ -4,37 +4,27 @@ import './App.css';
 import Map from './components/Map'
 // import Map2 from './components/Map2'
 import Map3 from './components/Map3'
-import Map4 from './components/Map4'
 import Map5 from './components/Map5'
-
-
-
+import Header from './components/Header'
 
 function App() {
   return (
-    // <div className="App">
-    //   {/* <Map /> */} {/* api call, old styling */}
-    //   <Map3 /> 
-    //   {/* new styling, uses local data and iterates */}
-    //   {/* <Map5 /> */}
-    //   {/* experimenting with point in polygon */}
-    // </div>
     <Router>
       <div className="App">
-        {/* <Header /> */}
+        <Header />
         <nav>
           <ul>
             <li>
               <Link to="/">Home</Link>
             </li>
             <li>
-              <Link to="/current/">Current</Link>
+              <Link to="/current/">Current</Link> {/* Map */}
             </li>
             <li>
-              <Link to="/over-time/">Over Time</Link>
+              <Link to="/over-time/">Over Time</Link> {/* Map 3 */}
             </li>
             <li>
-              <Link to="/neighborhoods/">Neighborhoods</Link>
+              <Link to="/neighborhoods/">Neighborhoods</Link> {/* Map 5 */}
             </li>
           </ul>
         </nav>
