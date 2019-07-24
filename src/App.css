@@ -38,3 +38,8 @@ h1 {
     transform: rotate(360deg);
   }
 }
+
+nav ul {
+  list-style: none;
+  margin-left: none;
+}

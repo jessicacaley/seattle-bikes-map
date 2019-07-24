@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
 import * as d3 from 'd3';
+import axios from 'axios';
 import seattleJson from '../data/seattleJson'
 import fakeAPI from '../data/fakeAPI'
-
+import './Map3.css'
 
 class Map extends Component { 
   constructor(props) {
@@ -11,15 +12,18 @@ class Map extends Component {
       dots: null,
       date: null,
       mapType: 'dots',
-      pause: false
+      pause: false,
+      address: "",
     };
   }
 
   width = 800;
   height = 750;
+  firstTime = 434381;
+  lastTime = 434395;
 
   componentDidMount() {
-    this.iterateOverTime()
+    this.getPoints(this.firstTime);
   }
 
   componentDidUpdate(previousProps, previousState) {
@@ -28,18 +32,35 @@ class Map extends Component {
     }
   }
 
+  // iterateOverTime = () => {
+  //   this.setState({pause: false})
+
+  //   var i = 0;
+  //   var intervalId = setInterval(() => {
+  //     if(i === (fakeAPI.length - 1) || this.state.pause ){
+  //       clearInterval(intervalId);
+  //     }
+  //     console.log(`Rendering map #${i+1}/${fakeAPI.length}...`)
+  //     this.getPoints(i);
+  //     i++;
+  //   }, 1500);
+  // }
+
   iterateOverTime = () => {
     this.setState({pause: false})
 
-    var i = 0;
+    let currentTime = this.firstTime;
+
+    let i = 0
     var intervalId = setInterval(() => {
-      if(i === (fakeAPI.length - 1) || this.state.pause ){
+      if(currentTime === this.lastTime || this.state.pause ){
         clearInterval(intervalId);
       }
-      console.log(`Rendering map #${i+1}/${fakeAPI.length}...`)
-      this.getPoints(i);
+      console.log(`Rendering map #${i+1}/${this.firstTime - this.lastTime}`);
+      this.getPoints(currentTime);
       i++;
-    }, 1500);
+      currentTime++;
+    }, 500);
   }
 
   drawContours = (svg, coordinates, projection) => {
@@ -181,7 +202,10 @@ class Map extends Component {
     svg.selectAll('circle')
       .data(coordinates).enter()
       .append('circle')
-      .attr('cx', (d) => projection(d)[0])
+      .attr('cx', (d) => { 
+        // console.log(d); 
+        return projection(d)[0];
+      })
       .attr('cy', (d) => projection(d)[1])
       .attr('r', '2px')
       .attr('fill', (d, i) => { 
@@ -194,6 +218,8 @@ class Map extends Component {
       .on('mouseover', handleMouseOver)
       .on('mouseout', handleMouseOut)
       .on('click', handleMouseClick);
+
+      // this.placeAddress(svg, projection)
   }
  
   datify = (secondsSinceEpoch) => {
@@ -213,13 +239,80 @@ class Map extends Component {
     this.setState({pause: true})
   }
 
+  onAddressChange = (event) => {
+    console.log(`Address Field updated ${event.target.value}`);
+    this.setState({
+      address: event.target.value,
+    });
+  }
+
+  onFormSubmit = (event) => {
+    event.preventDefault();
+    console.log(this.state.svg, this.state.projection)
+    this.placeAddress(this.state.svg, this.state.projection);
+  }
+
+  placeAddress = (svg, projection) => {
+    const address = this.state.address;
+
+    const params = {
+      key: "294f5da8a3f72c",
+      q: address + " Seattle",
+      format: "json"
+    };
+
+    axios.get('https://us1.locationiq.com/v1/search.php', { params: params })
+      .then(response => {
+        console.log(response.data[0])
+
+        const coordinates = [[response.data[0].lon, response.data[0].lat]];
+
+        var address = svg.append('g');
+    
+        address
+          .selectAll('circle')
+          .data(coordinates).enter()
+          .append('circle')
+          .attr('cx', (d) => { 
+            return projection(d)[0] 
+          })
+          .attr('cy', (d) => projection(d)[1])
+          .attr('r', '7px')
+          .attr('fill', 'transparent')
+          .attr('stroke', 'black')
+          .attr('stroke-width', 2)
+      })
+      .catch(response => {
+        console.log(response)
+      })
+  }
+
   render() {
     return (
       <div className='map'>
-        <button onClick={this.clickDotsButton}>Dots</button>
-        <button onClick={this.clickDensityButton}>Density</button>
-        <button onClick={this.iterateOverTime}>Replay</button>
-        <button onClick={this.pause}>Pause</button>
+        <form>
+          <input 
+            // className="form-control"
+            onChange={this.onAddressChange}
+            value={this.state.address}
+            name="address"
+            id="address"
+            type="text"
+            placeholder="Address" />
+          <input type="submit"
+            className="btn btn-secondary btn-sm" 
+            onClick={this.onFormSubmit} />
+        </form>
+        <div className="btn-toolbar justify-content-center" role="toolbar">
+          <div className="btn-group mr-2" role="group">
+            <button className="btn btn-secondary" onClick={this.clickDotsButton}>Dots</button>
+            <button className="btn btn-secondary" onClick={this.clickDensityButton}>Density</button>
+          </div>
+          <div className="btn-group" role="group">        
+            <button className="btn btn-secondary" onClick={this.iterateOverTime}>Play/Replay</button>
+            <button className="btn btn-secondary" onClick={this.pause}>Pause</button>
+          </div>
+        </div>
         <h1> {this.state.date} </h1>
         <section className='seattle'></section>
       </div>
