@@ -4,6 +4,8 @@ import axios from 'axios';
 import seattleJson from '../data/seattleJson'
 // import fakeAPI from '../data/fakeAPI'
 import './Map7.css'
+import neighborhoods from '../data/seattle-neighborhoods'
+
 
 
 class Map extends Component { 
@@ -42,10 +44,10 @@ class Map extends Component {
   iterateOverTime = () => {
     this.setState({pause: false})
 
-    let time = 434381;
+    let time = this.startTime;
     let i = 0
     var intervalId = setInterval(() => {
-      if(time === 434418 || this.state.pause ){ // 434418
+      if(time === this.endTime || this.state.pause || this.state.singleBike  ){ // 434418
         clearInterval(intervalId);
       }
       // console.log(`Rendering map #${i+1}/${fakeAPI.length}...`)
@@ -82,11 +84,12 @@ class Map extends Component {
       .enter()
       .append('path')
       .attr('d', d3.geoPath())
-      .attr('opacity', '.8')
+      .attr('opacity', '1')
       .attr('fill', d => color(d.value));
   }
 
   getPoints = (time) => {
+    this.setState({singleBike: false})
     // axios.get(`https://bike-data-visualization.firebaseio.com/times/${time}.json`)
     axios.get(`https://jessicacaley.github.io/historical-bike-data/times/${time}.json`)
       .then(response => {
@@ -148,9 +151,11 @@ class Map extends Component {
     //   .domain([6,9])
     //   .range(['#afd0e3', '#62889e']);
     const timeColorScale = d3.scaleThreshold()
-      .domain([5, 6, 7, 19, 20, 21])
-      .range(['#62889e', '#88acc1', '#afd0e3', '#d7e7f1', '#afd0e3', '#88acc1', '#62889e']);
-      
+      .domain([5, 6, 7, 19, 20, 21]) // sunrise/sunset
+      .range(['#62889e', '#88acc1', '#afd0e3', '#d7e7f1', '#afd0e3', '#88acc1', '#62889e']); //blues
+      // .range(['#696969', '#808080', '#A9A9A9', '#C0C0C0', '#A9A9A9', '#808080', '#696969']); //greys
+      //'#d7e7f1', 
+      //0, 
 
     // console.log(this.state.tfhour)
     // Classic D3... Select non-existent elements, bind the data, append the elements, and apply attributes
@@ -158,11 +163,17 @@ class Map extends Component {
       .data(seattleJson.features) // outline of seattle
       .enter()
       .append('path')
-      // .attr('fill', '#F7FCE8')
-      .attr('fill', timeColorScale(this.state.tfhour)) // height on sunlight = 2pm
-      .attr('stroke', 'grey')      
-      .attr('stroke-width', 2)
+      .attr('fill', '#F7FCE8')
+      // .attr('fill', timeColorScale(this.state.tfhour)) // height on sunlight = 2pm
+      // .attr('stroke', 'grey') 
+      // .attr('stroke', timeColorScale(this.state.tfhour)) // height on sunlight = 2pm
+      // .attr('stroke-width', .5)
       .attr('d', path);
+    
+    d3.select('body')
+      .style("background-color", timeColorScale(this.state.tfhour))
+      // .append('svg')
+      // .attr('fill', 'black')
 
     var coordinates = this.state.dots.features.map(feature => feature.geometry.coordinates);
 
@@ -225,7 +236,7 @@ class Map extends Component {
       that.followABike(this.getAttribute('name'))
     }
 
-    let radius = '2px'
+    let radius = '2.5px'
 
     if (this.state.singleBike) {
       radius = "8px"
@@ -244,8 +255,8 @@ class Map extends Component {
         const percentage = parseInt(dots.features[i].properties.jump_ebike_battery_level.slice(0, -1))
         return circleColorScale(percentage) 
       })
-      .attr('stroke', 'black')
-      .attr('stroke-width', 0.1)
+      // .attr('stroke', 'black')
+      // .attr('stroke-width', 0.1)
       .attr('name', (d, i) => dots.features[i].properties.name)
       .on('mouseover', handleMouseOver)
       .on('mouseout', handleMouseOut)
@@ -334,7 +345,7 @@ class Map extends Component {
       })
   }
 
-  //08510 is a good example
+  //08510 is a good example // 10329 for north // 10292
   singleBikeAnimation = (response) => {
     this.setState({ singleBike: true })
     let time = this.startTime
@@ -342,7 +353,7 @@ class Map extends Component {
 
     var intervalId = setInterval(() => {
 
-      if(time === this.endTime || this.state.pause ){ // 434418
+      if(time === this.endTime || this.state.pause){ // 434418
         clearInterval(intervalId);
       }
 
@@ -374,9 +385,7 @@ class Map extends Component {
       time++;
     }, 100);
 
-    this.setState({singleBike: false})
-
-    this.drawStaticMap();
+    // this.setState({singleBike: false})
   }
 
   followABike = (bikeName) => {
@@ -393,34 +402,37 @@ class Map extends Component {
 
     return (
       <div className='map'>
-        <form>
-          <input 
-            // className="form-control"
-            onChange={this.onAddressChange}
-            value={this.state.address}
-            name="address"
-            id="address"
-            type="text"
-            placeholder="Address" />
-          <input type="submit"
-            className="btn btn-secondary btn-sm" 
-            onClick={this.onFormSubmit} />
-        </form>
-        <div className="btn-toolbar justify-content-center" role="toolbar">
-          <div className="btn-group mr-2" role="group">
-            <button className="btn btn-secondary" onClick={this.clickDotsButton}>Dots</button>
-            <button className="btn btn-secondary" onClick={this.clickDensityButton}>Density</button>
+
+        <section className='left-side'>
+          <form>
+            <input 
+              // className="form-control"
+              onChange={this.onAddressChange}
+              value={this.state.address}
+              name="address"
+              id="address"
+              type="text"
+              placeholder="Address" />
+            <input type="submit"
+              className="btn btn-secondary btn-sm" 
+              onClick={this.onFormSubmit} />
+          </form>
+          <div className="btn-toolbar justify-content-center" role="toolbar">
+            <div className="btn-group mr-2" role="group">
+              <button className="btn btn-secondary" onClick={this.clickDotsButton}>Dots</button>
+              <button className="btn btn-secondary" onClick={this.clickDensityButton}>Density</button>
+              <button className="btn btn-secondary" onClick={this.drawStaticMap}>Reset Map</button>
+            </div>
+            <div className="btn-group" role="group">        
+              <button className={`btn btn-secondary ${this.visible}`} onClick={this.iterateOverTime}>Play/Replay</button> // TODO: THIS
+              <button className={`btn btn-secondary ${this.visible}`} onClick={this.pause}>Pause</button>
+            </div>
           </div>
-          <div className="btn-group" role="group">        
-            <button className="btn btn-secondary" onClick={this.iterateOverTime}>Play/Replay</button>
-            <button className="btn btn-secondary" onClick={this.pause}>Pause</button>
-          </div>
-          <div className="btn-group" role="group">
-            <button className="btn btn-secondary" onClick={this.followABike}>Follow A Bike</button>
-          </div>
-        </div>
-        <h1> {this.state.date} </h1>
+        </section>
         <section className='seattle'></section>
+        <section className='right-side'>
+          <h1> {this.state.date} </h1>
+        </section>
       </div>
     );
   }

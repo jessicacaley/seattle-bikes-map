@@ -13,6 +13,7 @@ class Map extends Component {
     this.state = {
       dots: null,
       date: null,
+      playButton: true,
     };
   }
 

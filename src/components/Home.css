@@ -1,11 +1,3 @@
-form {
-  padding: 10px;
-}
-
-body {
-  background-color: white;
-}
-
 .map {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
