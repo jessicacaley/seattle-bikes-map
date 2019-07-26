@@ -1,0 +1,17 @@
+{
+  "files": {
+    "main.css": "/seattle-bikes-map/static/css/main.d4f32130.chunk.css",
+    "main.js": "/seattle-bikes-map/static/js/main.f8684f28.chunk.js",
+    "main.js.map": "/seattle-bikes-map/static/js/main.f8684f28.chunk.js.map",
+    "runtime~main.js": "/seattle-bikes-map/static/js/runtime~main.dd7aac27.js",
+    "runtime~main.js.map": "/seattle-bikes-map/static/js/runtime~main.dd7aac27.js.map",
+    "static/css/2.22a7d4ef.chunk.css": "/seattle-bikes-map/static/css/2.22a7d4ef.chunk.css",
+    "static/js/2.4d89eab0.chunk.js": "/seattle-bikes-map/static/js/2.4d89eab0.chunk.js",
+    "static/js/2.4d89eab0.chunk.js.map": "/seattle-bikes-map/static/js/2.4d89eab0.chunk.js.map",
+    "index.html": "/seattle-bikes-map/index.html",
+    "precache-manifest.c2a08cd686ec965f8e4bf9cd1762423a.js": "/seattle-bikes-map/precache-manifest.c2a08cd686ec965f8e4bf9cd1762423a.js",
+    "service-worker.js": "/seattle-bikes-map/service-worker.js",
+    "static/css/2.22a7d4ef.chunk.css.map": "/seattle-bikes-map/static/css/2.22a7d4ef.chunk.css.map",
+    "static/css/main.d4f32130.chunk.css.map": "/seattle-bikes-map/static/css/main.d4f32130.chunk.css.map"
+  }
+}
