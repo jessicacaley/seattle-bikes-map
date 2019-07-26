@@ -24,7 +24,7 @@ class Map extends Component {
   width = 800;
   height = 750;
   startTime = 434383;
-  endTime = 434418;
+  endTime = 434490;
   // tfhour = 0;
 
   componentDidMount() {
@@ -54,7 +54,7 @@ class Map extends Component {
       this.getPoints(time);
       i++;
       time++;
-    }, 100);
+    }, 500);
   }
 
   drawContours = (svg, coordinates, projection) => {
@@ -77,7 +77,7 @@ class Map extends Component {
         // 4, 6, 7 is distorting, 10 (last with lines), 14, 16 1-17 big gap from 3 to 4
       );
 
-    var color = d3.scaleSequential(d3.interpolateYlGn)
+    var color = d3.scaleSequential(d3.interpolateYlGn) // don't show density with same color as battery
      .domain([0, .06]); // Points per square pixel.
     
     contours
@@ -152,7 +152,8 @@ class Map extends Component {
     //   .range(['#afd0e3', '#62889e']);
     const timeColorScale = d3.scaleThreshold()
       .domain([5, 6, 7, 19, 20, 21]) // sunrise/sunset
-      .range(['#62889e', '#88acc1', '#afd0e3', '#d7e7f1', '#afd0e3', '#88acc1', '#62889e']); //blues
+      .range(['#88acc1', '#95b8cc', '#a2c4d7', '#afd0e3', '#a2c4d7', '#95b8cc', '#88acc1']); //blues
+      // .range(['#62889e', '#88acc1', '#afd0e3', '#d7e7f1', '#afd0e3', '#88acc1', '#62889e']); //blues
       // .range(['#696969', '#808080', '#A9A9A9', '#C0C0C0', '#A9A9A9', '#808080', '#696969']); //greys
       //'#d7e7f1', 
       //0, 
@@ -357,6 +358,8 @@ class Map extends Component {
         clearInterval(intervalId);
       }
 
+      console.log(time)
+      console.log(response.data[`${time}`])
       // console.log(`Rendering map #${i+1}/${fakeAPI.length}...`)
       // this.getPoints(time);
       if (response.data[`${time}`]) {

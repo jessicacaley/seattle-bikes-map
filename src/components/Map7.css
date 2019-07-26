@@ -12,13 +12,13 @@ body {
 }
 
 .left-side {
-  grid-columns: 0 / 1;
+  grid-column: 1 / 2;
 }
 
 .seattle {
-  grid-columns: 1 / 2;
+  grid-column: 2 / 3;
 }
 
 .right-side {
-  grid-columns: 2 / 3;
+  grid-column: 3 / 4;
 }

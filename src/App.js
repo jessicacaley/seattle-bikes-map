@@ -3,9 +3,9 @@ import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import './App.css';
 import Map from './components/Map'
 // import Map2 from './components/Map2'
-import Map3 from './components/Map3'
+// import Map3 from './components/Map3'
 import Map5 from './components/Map5'
-import Map6 from './components/Map6'
+// import Map6 from './components/Map6'
 import Map7 from './components/Map7'
 import Home from './components/Home'
 
@@ -26,15 +26,15 @@ function App() {
                 <li className="nav-item">
                   <Link className="nav-link" to="/current/">Current</Link> {/* Map */}
                 </li>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/over-time/">Over Time</Link>
-                </li>
+                {/* <li className="nav-item"> */}
+                  {/* <Link className="nav-link" to="/over-time/">Over Time</Link> */}
+                {/* </li> */}
                 <li className="nav-item">
                   <Link className="nav-link" to="/neighborhoods/">Neighborhoods</Link> {/* Map 5 */}
                 </li>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/real-data-over-time/">Real Data Over Time</Link> {/* Map 5 */}
-                </li>
+                {/* <li className="nav-item"> */}
+                  {/* <Link className="nav-link" to="/real-data-over-time/">Real Data Over Time</Link> Map 5 */}
+                {/* </li> */}
                 <li className="nav-item">
                   <Link className="nav-link" to="/new-over-time/">New Over Time</Link> {/* Map 7 */}
                 </li>
@@ -44,9 +44,9 @@ function App() {
           <div className="content">
             <Route exact path="/" component={Home} />
             <Route path="/current" component={Current} />
-            <Route path="/over-time" component={OverTime} />
+            {/* <Route path="/over-time" component={OverTime} /> */}
             <Route path="/neighborhoods" component={Neighborhoods} />
-            <Route path="/real-data-over-time" component={RealDataOverTime} />
+            {/* <Route path="/real-data-over-time" component={RealDataOverTime} /> */}
             <Route path="/new-over-time" component={NewOverTime} />
           </div>
         </section>
@@ -63,17 +63,17 @@ function Current() {
   return <Map />;
 }
 
-function OverTime() {
-  return <Map3 />;
-}
+// function OverTime() {
+//   return <Map3 />;
+// }
 
 function Neighborhoods() {
   return <Map5 />;
 }
 
-function RealDataOverTime() {
-  return <Map6 />;
-}
+// function RealDataOverTime() {
+//   return <Map6 />;
+// }
 
 function NewOverTime() {
   return <Map7 />;
