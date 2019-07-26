@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/seattle-bikes-map/precache-manifest.c2a08cd686ec965f8e4bf9cd1762423a.js"
+  "/seattle-bikes-map/precache-manifest.860ca2e90884a9c86ce2f6225d0cd4ba.js"
 );
 
 self.addEventListener('message', (event) => {
