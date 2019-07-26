@@ -4,7 +4,7 @@ import './App.css';
 import Map from './components/Map'
 // import Map2 from './components/Map2'
 // import Map3 from './components/Map3'
-import Map5 from './components/Map5'
+import Neighborhoods from './components/Neighborhoods'
 // import Map6 from './components/Map6'
 import Map7 from './components/Map7'
 import Home from './components/Home'
@@ -67,9 +67,9 @@ function Current() {
 //   return <Map3 />;
 // }
 
-function Neighborhoods() {
-  return <Map5 />;
-}
+// function Neighborhoods() {
+//   return <Neighborhoods />;
+// }
 
 // function RealDataOverTime() {
 //   return <Map6 />;

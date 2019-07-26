@@ -7,7 +7,7 @@ import fakeAPI from '../data/fakeAPI'
 // would be cool to do this one as a comparison to average amount or density in each neighborhood instead of compared to other neighborhoods
 //// maybe i should have these maps all inherit from a Map class for some basic functions?
 
-class Map extends Component { 
+class Neighborhoods extends Component { 
   constructor(props) {
     super(props);
     this.state = {
@@ -201,4 +201,4 @@ class Map extends Component {
   }
 }
 
-export default Map;
+export default Neighborhoods;
