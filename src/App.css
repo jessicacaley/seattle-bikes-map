@@ -12,7 +12,8 @@ a {
 }
 
 a:hover {
-  color: darkgrey;
+  color: grey;
+  font-weight: bold;
 }
 
 nav ul {

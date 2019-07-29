@@ -1,5 +1,6 @@
 h1 {
-  color: #e9ecef;
+  color: #F0F5F4;
+  text-align: right;
 }
 
 form {
@@ -25,6 +26,7 @@ body {
 
 .right-side {
   grid-column: 3 / 4;
+  padding-right: 100px;
 }
 
 .invisible {
@@ -46,19 +48,14 @@ body {
 }
 
 .custom-progress-bar {
-  min-width: 500px;
-  float: left;
-  /* text-align: center; */
-  /* font-weight: bold; */
-}
-
-.progress-bar {
-  /* color: black; */
-  /* min-width: 500px */
+  width: 300px;
+  float: right;
 }
 
 .controls {
   display: flex;
-  height: 100px;
+  height: 50px;
   align-items: center;
+  display: flex;
+  flex-direction: row-reverse;
 }

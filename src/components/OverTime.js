@@ -23,7 +23,7 @@ class Map extends Component {
     };
   }
 
-  width = 800;
+  width = 500;
   height = 750;
   startTime = 434383; // Mon 7/22 midnight
   endTime = 434551; // Mon 7/29 midnight
@@ -73,7 +73,7 @@ class Map extends Component {
         // 4, 6, 7 is distorting, 10 (last with lines), 14, 16 1-17 big gap from 3 to 4
       );
 
-    var color = d3.scaleSequential(d3.interpolateGreys) // don't show density with same color as battery
+    var color = d3.scaleSequential(d3.interpolatePurples) // don't show density with same color as battery
      .domain([0, .06]); // Points per square pixel.
     
     contours
@@ -144,7 +144,8 @@ class Map extends Component {
       .append('path')
       // .attr('fill', '#F7FCE8')
       .attr('fill', '#e9ecef')
-      .attr('d', path);
+      .attr('d', path)
+      .attr('stroke', 'black');
     
     d3.select('body')
       .style("background-color", timeColorScale(this.state.tfhour))
@@ -245,13 +246,13 @@ class Map extends Component {
       tfhour = Number(hour);
     }
 
-    const day = time.split("/")[2]
+    const day = date.toLocaleDateString('en-EN', {weekday: 'long'})
 
     this.setState({ tfhour: tfhour, day: day })
 
     const shortTime = hour + amOrPm;
     
-    return `${date.toLocaleDateString()} ${shortTime}`;
+    return `${day} ${date.toLocaleDateString()} ${shortTime}`;
   }
 
   clickDotsButton = () => this.setState({ mapType: 'dots' })
@@ -311,6 +312,8 @@ class Map extends Component {
     let time = this.startTime;
 
     var intervalId2 = setInterval(() => {
+      console.log(this.state.day)
+
       if (time === this.endTime || this.state.pause) {
         clearInterval(intervalId2);
         if (!this.state.pause) this.setState({ pause: true });
@@ -366,21 +369,24 @@ class Map extends Component {
           </div>
         </section>
         <section className="middle">
+          
           <section className='seattle'></section>
+        </section>
+        <section className='right-side'>
           <div className="controls">
+            <div className="controls-progress">
+              <ProgressBar min={this.startTime} max={this.endTime} now={this.state.time} className="custom-progress-bar" variant="secondary" />
+            </div>
             <div className="controls-button">
               <button className={`btn play-stop ${this.state.pause ? "visible" : "invisible"}`} onClick={this.iterateOverTime}>&#9658;</button>
               {/* <FontAwesomeIcon icon="play" /> figure this out later */}
               {/* scrub bar? https://codepen.io/iamfiscus/pen/xbOyrE */}
               <button className={`btn play-stop ${this.state.pause ? "invisible" : "visible"}`} onClick={this.pause}>&#9724;</button>
             </div>
-            <div className="controls-progress">
-              <ProgressBar min={this.startTime} max={this.endTime} now={this.state.time} label={`${this.state.day}`} className="custom-progress-bar" variant="secondary" />
-            </div>
           </div>
-        </section>
-        <section className='right-side'>
-          <h1> {this.state.date} </h1>
+          <h1> {this.state.date ? this.state.date.split(' ')[0] : ''} </h1>
+          <h1> {this.state.date ? this.state.date.split(' ')[1] : ''} </h1>
+          <h1> {this.state.date ? this.state.date.split(' ')[2] : ''} </h1>
         </section>
       </div>
     );
