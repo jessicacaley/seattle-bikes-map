@@ -15,7 +15,7 @@ class Map extends Component {
       dots: null,
       date: null,
       mapType: 'dots',
-      pause: true,
+      control: 'play',
       address: "",
       tfhour: 0,
       time: 434383,
@@ -38,15 +38,19 @@ class Map extends Component {
     }
   }
 
-  drawStaticMap = () => this.getPoints(this.startTime);
+  drawStaticMap = () => {
+    this.getPoints(this.startTime);
+    this.setState({ control: 'play' })
+  }
 
   iterateOverTime = () => {
-    this.setState({pause: false})
+    this.setState({control: 'stop'})
 
     let time = this.startTime;
     var intervalId = setInterval(() => {
-      if(time === this.endTime || this.state.pause || this.state.singleBike) {
+      if(time === this.endTime || this.state.control !== "stop" || this.state.singleBike) {
         clearInterval(intervalId);
+        this.setState({ control: 'reset' })
       }
       this.getPoints(time);
       time++;
@@ -115,7 +119,7 @@ class Map extends Component {
     var g = svg.append('g');
 
     // Create a unit projection.
-    var projection = d3.geoAlbers()
+    var projection = d3.geoMercator()
       .scale(1)
       .translate([0, 0]);
 
@@ -174,18 +178,20 @@ class Map extends Component {
 
     const handleMouseOver = function handleMouseOver(d, i) {
       d3.select(this)
-        .attr('r', '6px');
+        .attr('r', '8px')
+        .attr('stroke', 'black');
     }
 
     const handleMouseOut = function handleMouseOut(d, i) {
       d3.select(this)
         .attr('r', '2px')
+        .attr('stroke', 'transparent');
     }
 
     const that = this;
 
     const handleMouseClick = function handleMouseClick(d, i) {
-      that.setState({ pause: false });
+      that.setState({ control: 'stop' });
 
       d3.select(this);
      
@@ -209,10 +215,12 @@ class Map extends Component {
       //   .remove();
     }
 
-    let radius = '2.5px'
+    let radius = '2.5px';
+    let stroke = 'transparent';
 
     if (this.state.singleBike) {
-      radius = "8px"
+      radius = '8px';
+      stroke = 'black';
     }
 
     svg.selectAll('circle')
@@ -221,14 +229,16 @@ class Map extends Component {
       .attr('cx', d => projection(d)[0])
       .attr('cy', d => projection(d)[1])
       .attr('r', radius)
+      .attr('stroke', stroke)
+      .attr('stroke-width', '.5')
       .attr('fill', (d, i) => { 
         const percentage = parseInt(dots.features[i].properties.jump_ebike_battery_level.slice(0, -1))
         return circleColorScale(percentage) 
       })
       .attr('name', (d, i) => dots.features[i].properties.name)
-      .on('mouseover', handleMouseOver)
-      .on('mouseout', handleMouseOut)
-      .on('click', handleMouseClick);
+      .on('mouseover', this.state.control === 'stop' ? '' : handleMouseOver)
+      .on('mouseout', this.state.control === 'stop' ? '' : handleMouseOut)
+      .on('click', this.state.control === 'stop' ? '' : handleMouseClick);
   }
  
   datify = (secondsSinceEpoch) => {
@@ -259,7 +269,7 @@ class Map extends Component {
 
   clickDensityButton = () => this.setState({ mapType: 'density' })
 
-  pause = () => this.setState({ pause: true })
+  stop = () => this.setState({ control: 'reset' })
 
   onAddressChange = (event) => {
     console.log(`Address Field updated ${event.target.value}`);
@@ -308,15 +318,15 @@ class Map extends Component {
 
   //08510 is a good example // 10329 for north // 10292
   singleBikeAnimation = (response) => {
-    this.setState({ singleBike: true, pause: false })
+    this.setState({ singleBike: true, control: 'stop' })
     let time = this.startTime;
 
     var intervalId2 = setInterval(() => {
       console.log(this.state.day)
 
-      if (time === this.endTime || this.state.pause) {
+      if (time === this.endTime || this.state.control !== 'stop') {
         clearInterval(intervalId2);
-        if (!this.state.pause) this.setState({ pause: true });
+        this.setState({ control: 'reset' });
       } 
 
       const features = response.data[`${time}`] ? [ response.data[`${time}`] ] : [];
@@ -363,9 +373,7 @@ class Map extends Component {
             <div className="btn-group mr-2" role="group">
               <button className="btn btn-secondary" onClick={this.clickDotsButton}>Dots</button>
               <button className="btn btn-secondary" onClick={this.clickDensityButton}>Density</button>
-              <button className="btn btn-secondary" onClick={this.drawStaticMap}>Reset Map</button>
             </div>
-            
           </div>
         </section>
         <section className="middle">
@@ -378,10 +386,11 @@ class Map extends Component {
               <ProgressBar min={this.startTime} max={this.endTime} now={this.state.time} className="custom-progress-bar" variant="secondary" />
             </div>
             <div className="controls-button">
-              <button className={`btn play-stop ${this.state.pause ? "visible" : "invisible"}`} onClick={this.iterateOverTime}>&#9658;</button>
+              <button className={`btn play-stop ${this.state.control === 'play' ? "visible" : "invisible"}`} onClick={this.iterateOverTime}>&#9658;</button>
               {/* <FontAwesomeIcon icon="play" /> figure this out later */}
               {/* scrub bar? https://codepen.io/iamfiscus/pen/xbOyrE */}
-              <button className={`btn play-stop ${this.state.pause ? "invisible" : "visible"}`} onClick={this.pause}>&#9724;</button>
+              <button className={`btn play-stop ${this.state.control === 'stop' ? "visible" : "invisible"}`} onClick={this.stop}>&#9724;</button>
+              <button className={`btn play-stop ${this.state.control === 'reset' ? "visible" : "invisible"}`} onClick={this.drawStaticMap}>&laquo;</button>
             </div>
           </div>
           <h1> {this.state.date ? this.state.date.split(' ')[0] : ''} </h1>
