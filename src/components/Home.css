@@ -2,7 +2,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
 }
-
+/* 
 .left-side {
   grid-columns: 0 / 1;
 }
@@ -13,4 +13,4 @@
 
 .right-side {
   grid-columns: 2 / 3;
-}
+} */

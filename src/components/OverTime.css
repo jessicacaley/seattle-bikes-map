@@ -1,0 +1,64 @@
+h1 {
+  color: #e9ecef;
+}
+
+form {
+  padding: 10px;
+}
+
+body {
+  background-color: white;
+}
+
+.map {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.left-side {
+  grid-column: 1 / 2;
+}
+
+.seattle {
+  grid-column: 2 / 3;
+}
+
+.right-side {
+  grid-column: 3 / 4;
+}
+
+.invisible {
+  display: none;
+}
+
+.play-stop {
+  color: grey;
+  font-size: 1.2em;
+  float: left;
+}
+
+.play-stop:hover {
+  color: grey;
+}
+
+.play-stop:active {
+  color: white;
+}
+
+.custom-progress-bar {
+  min-width: 500px;
+  float: left;
+  /* text-align: center; */
+  /* font-weight: bold; */
+}
+
+.progress-bar {
+  /* color: black; */
+  /* min-width: 500px */
+}
+
+.controls {
+  display: flex;
+  height: 100px;
+  align-items: center;
+}

@@ -3,6 +3,10 @@ import * as d3 from 'd3';
 import seattleJson from '../data/seattleJson'
 import neighborhoods from '../data/seattle-neighborhoods'
 import fakeAPI from '../data/fakeAPI'
+import d3Tip from "d3-tip"
+import './Neighborhoods.css'
+
+
 
 // would be cool to do this one as a comparison to average amount or density in each neighborhood instead of compared to other neighborhoods
 //// maybe i should have these maps all inherit from a Map class for some basic functions?
@@ -23,7 +27,7 @@ class Neighborhoods extends Component {
   componentDidMount() {
     var i = 0;
     var intervalId = setInterval(() => {
-      if(i === (fakeAPI.length - 1)) clearInterval(intervalId);
+      if (i === (fakeAPI.length - 1)) clearInterval(intervalId);
       console.log(`Rendering map #${i+1}/${fakeAPI.length}...`)
       this.getPoints(i);
       i++;
@@ -44,6 +48,13 @@ class Neighborhoods extends Component {
   }
 
   drawMap() {
+    const tip = d3Tip();
+    // tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return d; });
+
+
+    tip.attr("class", "d3-tip")
+      .html(d => { console.log(d); return d.properties.name; })
+   
     d3.selectAll('svg').remove();
 
     // Create SVG
@@ -51,6 +62,8 @@ class Neighborhoods extends Component {
       .append( 'svg' )
       .attr( 'width', this.width )
       .attr( 'height', this.height );
+    
+    svg.call(tip)    
 
     // Append empty placeholder g element to the SVG
     // g will contain geometry elements
@@ -74,26 +87,6 @@ class Neighborhoods extends Component {
     projection
       .scale(s)
       .translate(t);
-    
-    const handleMouseOver = function handleMouseOver() {
-      const that = this
-
-      svg.append('text')
-        .attr('id', 'i' + (that.getAttribute('name')).split(' ').join('').split(':').join(''))
-        .attr('x', () => 100)
-        .attr('y', () => 100)
-        .text(() => that.getAttribute('name'));
-    } 
-
-    const handleMouseOut = function handleMouseOut() {
-      d3.select(
-        `${'#i' + this.getAttribute('name')
-          .split(' ')
-          .join('')
-          .split(':')
-          .join('')}`)
-        .remove();
-    }
 
     let neighborhoodBikeCount = {}
 
@@ -106,7 +99,7 @@ class Neighborhoods extends Component {
         const points = fakeAPI[this.state.i].features;
         
         points.forEach(point => {
-          if(d3.polygonContains(hood, point.geometry.coordinates)) {
+          if (d3.polygonContains(hood, point.geometry.coordinates)) {
             bikeCount += 1;
           }
         })
@@ -120,11 +113,11 @@ class Neighborhoods extends Component {
             const points = fakeAPI[this.state.i].features;
             
             points.forEach(point => {
-              if(d3.polygonContains(hood, point.geometry.coordinates)) {
+              if (d3.polygonContains(hood, point.geometry.coordinates)) {
                 bikeCount += 1;
               }
             })
-            if(neighborhoodBikeCount[feature.id]) {
+            if (neighborhoodBikeCount[feature.id]) {
               neighborhoodBikeCount[feature.id] += bikeCount / feature.properties.area;
             } else {
               neighborhoodBikeCount[feature.id] = bikeCount / feature.properties.area;
@@ -136,12 +129,12 @@ class Neighborhoods extends Component {
               const points = fakeAPI[this.state.i].features
               
               points.forEach(point => {
-                if(d3.polygonContains(section, point.geometry.coordinates)) {
+                if (d3.polygonContains(section, point.geometry.coordinates)) {
                   bikeCount += 1;
                 }
               })
 
-              if(neighborhoodBikeCount[feature.id]) {
+              if (neighborhoodBikeCount[feature.id]) {
                 neighborhoodBikeCount[feature.id] += bikeCount / feature.properties.area;
               } else {
                 neighborhoodBikeCount[feature.id] = bikeCount / feature.properties.area;
@@ -172,8 +165,14 @@ class Neighborhoods extends Component {
       .attr('stroke-width', 1)
       .attr('d', path)
       .attr('name', (d) => d.id)
-      .on('mouseover', handleMouseOver)
-      .on('mouseout', handleMouseOut);
+      .on('mouseover', function(d){
+        tip.show(d, this);
+        this.style['stroke-width'] = 3;
+      })
+      .on('mouseout', function(d){
+        tip.hide(d, this);
+        this.style['stroke-width'] = 1;
+      })      
 
     var coordinates = this.state.dots.features.map(feature => {
       return feature.geometry.coordinates;

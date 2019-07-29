@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
 import * as d3 from 'd3';
 import axios from 'axios';
+// import FontAwesomeIcon from 'FontAwesomeIcon'; figure out this later
 import seattleJson from '../data/seattleJson'
-// import fakeAPI from '../data/fakeAPI'
-import './Map7.css'
+import ProgressBar from 'react-bootstrap/ProgressBar';
+import './OverTime.css'
 import neighborhoods from '../data/seattle-neighborhoods'
-
 
 
 class Map extends Component { 
@@ -15,44 +15,40 @@ class Map extends Component {
       dots: null,
       date: null,
       mapType: 'dots',
-      pause: false,
+      pause: true,
       address: "",
       tfhour: 0,
+      time: 434383,
+      day: 22,
     };
   }
 
   width = 800;
   height = 750;
-  startTime = 434383;
-  endTime = 434490;
-  // tfhour = 0;
+  startTime = 434383; // Mon 7/22 midnight
+  endTime = 434551; // Mon 7/29 midnight
 
   componentDidMount() {
     this.drawStaticMap();
   }
 
   componentDidUpdate(previousProps, previousState) {
-    if ((this.state.dots !== previousState.dots) || (this.state.mapType !== previousState.mapType)) {  
+    if (this.state.dots !== previousState.dots || this.state.mapType !== previousState.mapType) {  
       this.drawMap();
     }
   }
 
-  drawStaticMap = () => {
-    this.getPoints(this.startTime);
-  }
+  drawStaticMap = () => this.getPoints(this.startTime);
 
   iterateOverTime = () => {
     this.setState({pause: false})
 
     let time = this.startTime;
-    let i = 0
     var intervalId = setInterval(() => {
-      if(time === this.endTime || this.state.pause || this.state.singleBike  ){ // 434418
+      if(time === this.endTime || this.state.pause || this.state.singleBike) {
         clearInterval(intervalId);
       }
-      // console.log(`Rendering map #${i+1}/${fakeAPI.length}...`)
       this.getPoints(time);
-      i++;
       time++;
     }, 500);
   }
@@ -77,7 +73,7 @@ class Map extends Component {
         // 4, 6, 7 is distorting, 10 (last with lines), 14, 16 1-17 big gap from 3 to 4
       );
 
-    var color = d3.scaleSequential(d3.interpolateYlGn) // don't show density with same color as battery
+    var color = d3.scaleSequential(d3.interpolateGreys) // don't show density with same color as battery
      .domain([0, .06]); // Points per square pixel.
     
     contours
@@ -90,13 +86,13 @@ class Map extends Component {
 
   getPoints = (time) => {
     this.setState({singleBike: false})
-    // axios.get(`https://bike-data-visualization.firebaseio.com/times/${time}.json`)
+
     axios.get(`https://jessicacaley.github.io/historical-bike-data/times/${time}.json`)
       .then(response => {
-        const data = response.data
         this.setState({
-          dots: data,
-          date: this.datify(data.features[0].properties.time)
+          dots: response.data,
+          date: this.datify(response.data.features[0].properties.time),
+          time: time,
         });
       })
       .catch(error => {
@@ -106,16 +102,6 @@ class Map extends Component {
   }
 
   drawMap = () => {
-
-    
-
-    // d3.select('.map').attr("background-color", timeColorScale(Math.abs(12-this.state.tfhour)))
-    // d3.select('.map').attr("background-color", "white")
-    
-      // backgroundColor = timeColorScale(Math.abs(12-this.state.tfhour))
-    // console.log(timeColorScale(Math.abs(12-this.state.tfhour)))
-    // document.body.style.backgroundColor = timeColorScale(Math.abs(12-this.state.tfhour));
-
     d3.selectAll('svg').remove();
 
     // Create SVG
@@ -147,34 +133,21 @@ class Map extends Component {
       .scale(s)
       .translate(t);
 
-    // const timeColorScale = d3.scaleLinear()
-    //   .domain([6,9])
-    //   .range(['#afd0e3', '#62889e']);
     const timeColorScale = d3.scaleThreshold()
       .domain([5, 6, 7, 19, 20, 21]) // sunrise/sunset
-      .range(['#88acc1', '#95b8cc', '#a2c4d7', '#afd0e3', '#a2c4d7', '#95b8cc', '#88acc1']); //blues
-      // .range(['#62889e', '#88acc1', '#afd0e3', '#d7e7f1', '#afd0e3', '#88acc1', '#62889e']); //blues
-      // .range(['#696969', '#808080', '#A9A9A9', '#C0C0C0', '#A9A9A9', '#808080', '#696969']); //greys
-      //'#d7e7f1', 
-      //0, 
+      .range(['#88acc1', '#95b8cc', '#a2c4d7', '#afd0e3', '#a2c4d7', '#95b8cc', '#88acc1']);
 
-    // console.log(this.state.tfhour)
     // Classic D3... Select non-existent elements, bind the data, append the elements, and apply attributes
     g.selectAll('path')
       .data(seattleJson.features) // outline of seattle
       .enter()
       .append('path')
-      .attr('fill', '#F7FCE8')
-      // .attr('fill', timeColorScale(this.state.tfhour)) // height on sunlight = 2pm
-      // .attr('stroke', 'grey') 
-      // .attr('stroke', timeColorScale(this.state.tfhour)) // height on sunlight = 2pm
-      // .attr('stroke-width', .5)
+      // .attr('fill', '#F7FCE8')
+      .attr('fill', '#e9ecef')
       .attr('d', path);
     
     d3.select('body')
       .style("background-color", timeColorScale(this.state.tfhour))
-      // .append('svg')
-      // .attr('fill', 'black')
 
     var coordinates = this.state.dots.features.map(feature => feature.geometry.coordinates);
 
@@ -201,28 +174,18 @@ class Map extends Component {
     const handleMouseOver = function handleMouseOver(d, i) {
       d3.select(this)
         .attr('r', '6px');
-      
-      const that = this;
-
-      svg.append('text')
-        .attr('id', 'i' + (this.getAttribute('name'))) // Create an id for text so we can select it later for removing on mouseout
-        .attr('x', () => 100)
-        .attr('y', () => 100)
-        .text(() => that.getAttribute('name'));
-
     }
 
     const handleMouseOut = function handleMouseOut(d, i) {
       d3.select(this)
         .attr('r', '2px')
-        
-      d3.select(`${'#i' + this.getAttribute('name')}`).remove();
     }
 
     const that = this;
 
     const handleMouseClick = function handleMouseClick(d, i) {
-      that.setState({ pause: false })
+      that.setState({ pause: false });
+
       d3.select(this);
      
       d3.select('#description').remove();
@@ -232,9 +195,17 @@ class Map extends Component {
         .attr('x', () => 700)
         .attr('y', () => 350)
         .text(() => dots.features[i].properties.name);
-        // .text(() => dots.features[i].properties.jump_ebike_battery_level);
 
-      that.followABike(this.getAttribute('name'))
+      that.followABike(this.getAttribute('name'));
+
+      // put this somewhere
+      // d3.select(
+      //   `${'#i' + this.getAttribute('name')
+      //     .split(' ')
+      //     .join('')
+      //     .split(':')
+      //     .join('')}`)
+      //   .remove();
     }
 
     let radius = '2.5px'
@@ -246,24 +217,17 @@ class Map extends Component {
     svg.selectAll('circle')
       .data(coordinates).enter()
       .append('circle')
-      .attr('cx', (d) => { 
-        // console.log(d); 
-        return projection(d)[0];
-      })
-      .attr('cy', (d) => projection(d)[1])
+      .attr('cx', d => projection(d)[0])
+      .attr('cy', d => projection(d)[1])
       .attr('r', radius)
       .attr('fill', (d, i) => { 
         const percentage = parseInt(dots.features[i].properties.jump_ebike_battery_level.slice(0, -1))
         return circleColorScale(percentage) 
       })
-      // .attr('stroke', 'black')
-      // .attr('stroke-width', 0.1)
       .attr('name', (d, i) => dots.features[i].properties.name)
       .on('mouseover', handleMouseOver)
       .on('mouseout', handleMouseOut)
       .on('click', handleMouseClick);
-
-      // this.placeAddress(svg, projection)
   }
  
   datify = (secondsSinceEpoch) => {
@@ -281,25 +245,20 @@ class Map extends Component {
       tfhour = Number(hour);
     }
 
-    this.setState({tfhour: tfhour})
+    const day = time.split("/")[2]
 
-    const shortTime = hour + amOrPm
+    this.setState({ tfhour: tfhour, day: day })
+
+    const shortTime = hour + amOrPm;
     
-
     return `${date.toLocaleDateString()} ${shortTime}`;
   }
 
-  clickDotsButton = () => {
-    this.setState({mapType: 'dots'})
-  }
+  clickDotsButton = () => this.setState({ mapType: 'dots' })
 
-  clickDensityButton = () => {
-    this.setState({mapType: 'density'})
-  }
+  clickDensityButton = () => this.setState({ mapType: 'density' })
 
-  pause = () => {
-    this.setState({pause: true})
-  }
+  pause = () => this.setState({ pause: true })
 
   onAddressChange = (event) => {
     console.log(`Address Field updated ${event.target.value}`);
@@ -348,64 +307,41 @@ class Map extends Component {
 
   //08510 is a good example // 10329 for north // 10292
   singleBikeAnimation = (response) => {
-    this.setState({ singleBike: true })
-    let time = this.startTime
-    let i = 0
+    this.setState({ singleBike: true, pause: false })
+    let time = this.startTime;
 
-    var intervalId = setInterval(() => {
+    var intervalId2 = setInterval(() => {
+      if (time === this.endTime || this.state.pause) {
+        clearInterval(intervalId2);
+        if (!this.state.pause) this.setState({ pause: true });
+      } 
 
-      if(time === this.endTime || this.state.pause){ // 434418
-        clearInterval(intervalId);
+      const features = response.data[`${time}`] ? [ response.data[`${time}`] ] : [];
+
+      const dots = {
+        "type": "FeatureCollection",
+        "features": features
       }
 
-      console.log(time)
-      console.log(response.data[`${time}`])
-      // console.log(`Rendering map #${i+1}/${fakeAPI.length}...`)
-      // this.getPoints(time);
-      if (response.data[`${time}`]) {
-        const dot = response.data[`${time}`]
-        const features = {
-          "type": "FeatureCollection",
-          "features": [ dot ]
-        }
-        this.setState({
-          dots: features,
-          date: this.datify(time * 3600)
-        });
-      } else {
-        const emptyFeatures = {
-          "type": "FeatureCollection",
-          "features": []
-        }
+      this.setState({
+        dots: dots,
+        date: this.datify(time * 3600),
+        time: time
+      });
 
-        this.setState({
-          dots: emptyFeatures,
-          date: this.datify(time * 3600)
-        });
-      }
-
-      i++;
       time++;
     }, 100);
-
-    // this.setState({singleBike: false})
   }
 
   followABike = (bikeName) => {
     axios.get(`https://jessicacaley.github.io/historical-bike-data/bikes/${bikeName}.json`)
-      .then(response => {
-        this.singleBikeAnimation(response)
-      })
-      .catch(error => {
-        console.log(error)
-      })
+      .then(response => this.singleBikeAnimation(response))
+      .catch(error => console.log(error))
   }
 
   render() {
-
     return (
       <div className='map'>
-
         <section className='left-side'>
           <form>
             <input 
@@ -426,13 +362,23 @@ class Map extends Component {
               <button className="btn btn-secondary" onClick={this.clickDensityButton}>Density</button>
               <button className="btn btn-secondary" onClick={this.drawStaticMap}>Reset Map</button>
             </div>
-            <div className="btn-group" role="group">        
-              <button className={`btn btn-secondary ${this.visible}`} onClick={this.iterateOverTime}>Play/Replay</button> // TODO: THIS
-              <button className={`btn btn-secondary ${this.visible}`} onClick={this.pause}>Pause</button>
+            
+          </div>
+        </section>
+        <section className="middle">
+          <section className='seattle'></section>
+          <div className="controls">
+            <div className="controls-button">
+              <button className={`btn play-stop ${this.state.pause ? "visible" : "invisible"}`} onClick={this.iterateOverTime}>&#9658;</button>
+              {/* <FontAwesomeIcon icon="play" /> figure this out later */}
+              {/* scrub bar? https://codepen.io/iamfiscus/pen/xbOyrE */}
+              <button className={`btn play-stop ${this.state.pause ? "invisible" : "visible"}`} onClick={this.pause}>&#9724;</button>
+            </div>
+            <div className="controls-progress">
+              <ProgressBar min={this.startTime} max={this.endTime} now={this.state.time} label={`${this.state.day}`} className="custom-progress-bar" variant="secondary" />
             </div>
           </div>
         </section>
-        <section className='seattle'></section>
         <section className='right-side'>
           <h1> {this.state.date} </h1>
         </section>
