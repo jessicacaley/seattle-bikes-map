@@ -3,7 +3,7 @@ import * as d3 from 'd3';
 import axios from 'axios';
 // import FontAwesomeIcon from 'FontAwesomeIcon'; figure out this later
 import seattleJson from '../data/seattleJson'
-import './OverTime.css'
+import './Current.css'
 import neighborhoods from '../data/seattle-neighborhoods'
 
 
@@ -18,6 +18,7 @@ class Map extends Component {
       tfhour: 0,
       time: 434383,
       day: 22,
+      showDetails: false,
     };
   }
 
@@ -34,6 +35,10 @@ class Map extends Component {
     if (this.state.dots !== previousState.dots || this.state.mapType !== previousState.mapType) {  
       this.drawMap();
     }
+
+    // if (this.state.showDetails !== previousState.showDetails) {
+    //   this.drawMap();
+    // }
   }
 
   drawContours = (svg, coordinates, projection) => {
@@ -185,6 +190,23 @@ class Map extends Component {
           .attr('stroke', 'transparent');
     }
 
+    const that = this;
+
+    const handleMouseClick = function handleMouseClick(d, i) {
+      d3.select('.bike-info')
+        .html('')
+
+      d3.select('.bike-info')
+        .append('text')
+        .html(() => `
+          <li>name: <b>${this.getAttribute('name')}</b></li>
+          <li>id: <b>${this.getAttribute('id')}</b></li>
+          <li className=".bike-info__battery">battery: <b>${this.getAttribute('battery')}%</b></li>
+        `);
+      
+      that.setState({  showDetails: true });
+    }
+
     let radius = '2.5px';
     let stroke = 'transparent';
 
@@ -201,9 +223,17 @@ class Map extends Component {
         const percentage = parseInt(dots.features[i].properties.jump_ebike_battery_level.slice(0, -1))
         return circleColorScale(percentage) 
       })
+      .attr('battery', (d, i) => { 
+        const percentage = parseInt(dots.features[i].properties.jump_ebike_battery_level.slice(0, -1))
+        return percentage
+      })
+      .attr('id', (d, i) => dots.features[i].properties.bike_id)
       .attr('name', (d, i) => dots.features[i].properties.name)
-      .on('mouseover', this.state.control === 'stop' ? '' : handleMouseOver)
-      .on('mouseout', this.state.control === 'stop' ? '' : handleMouseOut)
+      .on('mouseover', handleMouseOver)
+      .on('mouseout', handleMouseOut)
+      .on('click', handleMouseClick)
+
+
   }
  
   datify = (secondsSinceEpoch) => {
@@ -294,6 +324,13 @@ class Map extends Component {
             <div className="btn-group buttons" role="group">
               <button className="btn btn-secondary" onClick={this.clickDotsButton}>Dots</button>
               <button className="btn btn-secondary" onClick={this.clickDensityButton}>Density</button>
+            </div>
+            <div className={`current-bike current-bike__current ${this.state.showDetails ? 'visible' : 'invisible'}`}>
+              <ul className="bike-info bike-info__current">
+                <li>name: </li>
+                <li>id: </li>
+                <li>battery: </li>
+              </ul>
             </div>
           </section>
         </div>

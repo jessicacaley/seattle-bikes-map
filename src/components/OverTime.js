@@ -20,7 +20,8 @@ class Map extends Component {
       tfhour: 0,
       time: 434383,
       day: 22,
-      singleBike: false
+      singleBike: false,
+      showDetails: true,
     };
   }
 
@@ -193,27 +194,27 @@ class Map extends Component {
       console.log(`d: ${d}`)
       console.log(`i: ${i}`)
       
-      d3.select('.bike-info')
-        .append('text')
-        .html(() => `
-          <li>name: ${this.getAttribute('name')}</li>
-          <li>id: ${this.getAttribute('id')}</li>
-          <li className="bike-info__battery">battery: ${this.getAttribute('battery')}%</li>
-        `);
+      // d3.select('.bike-info')
+      //   .append('text')
+      //   .html(() => `
+      //     <li>name: ${this.getAttribute('name')}</li>
+      //     <li>id: ${this.getAttribute('id')}</li>
+      //     <li className="bike-info__battery">battery: ${this.getAttribute('battery')}%</li>
+      //   `);
     }
 
     const handleMouseOut = function handleMouseOut(d, i) {
       // that.setState({ showDetails: false })
 
-      radius = that.state.singleBike ? '8px' : '2px'
+      // radius = that.state.singleBike ? '8px' : '2.5px'
 
       d3.select(this)
         .transition().duration([200])
           .attr('r', radius)
           .attr('stroke', 'transparent');
 
-      d3.select('.bike-info')
-        .html(() => '')
+      // d3.select('.bike-info')
+      //   .html(() => '')
     }
 
     const that = this;
@@ -243,14 +244,9 @@ class Map extends Component {
       //   .remove();
     }
 
-    let radius = '2.5px';
-    let stroke = 'transparent';
-
-    if (this.state.singleBike) {
-      radius = '8px';
-      stroke = 'black';
-    }
-
+    const radius = this.state.singleBike ? '8px' : '2.5px';
+    const stroke = this.state.singleBike ? 'black' : 'transparent';
+ 
     svg.selectAll('circle')
       .data(coordinates)
       .enter()
@@ -385,9 +381,9 @@ class Map extends Component {
       d3.select('.bike-info')
         .append('text')
         .html(() => `
-          <li>name: ${this.state.bikeName}</li>
-          <li>id: ${this.state.bikeId}</li>
-          <li className=".bike-info__battery">battery: ${this.state.battery}</li>
+          <li>name: <b>${this.state.bikeName}</b></li>
+          <li>id: <b>${this.state.bikeId}</b></li>
+          <li className=".bike-info__battery">battery: <b>${this.state.battery}</b></li>
         `);
 
       this.setState({
@@ -398,7 +394,7 @@ class Map extends Component {
       });
 
       time++;
-    }, 100);
+    }, 150);
   }
 
   followABike = (bikeName) => {
@@ -446,7 +442,7 @@ class Map extends Component {
               <div className="controls-button">
                 <button className={`btn play-stop ${this.state.control === 'play' ? "visible" : "invisible"}`} onClick={this.iterateOverTime}>&#9658;</button>
                 <button className={`btn play-stop ${this.state.control === 'stop' ? "visible" : "invisible"}`} onClick={this.stop}>&#9724;</button>
-                <button className={`btn play-stop ${this.state.control === 'reset' ? "visible" : "invisible"}`} onClick={this.drawStaticMap}>&laquo;</button>
+                <button className={`btn play-stop ${this.state.control === 'reset' ? "visible" : "invisible"}`} onClick={this.drawStaticMap}>&#10226;</button>
               </div>
             </div>
             <h1> {this.state.date ? this.state.date.split(' ')[0] : ''} </h1>
@@ -457,8 +453,8 @@ class Map extends Component {
               <button className="btn btn-secondary" onClick={this.clickDensityButton}>Density</button>
             </div>
             <div className={`btn-group buttons show-or-hide ${this.state.singleBike ? 'visible' : 'invisible'}`}>
-              <button className={`btn btn-sm ${!this.state.showDetails ? 'visible' : 'invisible'}`} onClick={this.revealDetails}>Show Details</button>
-              <button className={`btn btn-sm ${this.state.showDetails ? 'visible' : 'invisible'}`} onClick={this.hideDetails}>Hide Details</button>
+              <button className={`btn btn-sm ${!this.state.showDetails ? 'visible' : 'invisible'}`} onClick={this.revealDetails}>Show Bike Details</button>
+              <button className={`btn btn-sm ${this.state.showDetails ? 'visible' : 'invisible'}`} onClick={this.hideDetails}>Hide Bike Details</button>
             </div>
             <div className={`current-bike ${this.state.showDetails && this.state.singleBike ? 'visible' : 'invisible'}`}>
               <ul className="bike-info"></ul>
