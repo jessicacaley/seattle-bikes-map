@@ -10,12 +10,12 @@ import neighborhoods from '../data/seattle-neighborhoods'
 class Map extends Component { 
   constructor(props) {
     super(props);
+
     this.state = {
       dots: null,
       date: null,
       mapType: 'dots',
       address: "",
-      tfhour: 0,
       time: 434383,
       day: 22,
       showDetails: false,
@@ -80,7 +80,18 @@ class Map extends Component {
           date: this.datify(response.data.last_updated)
         })
 
-        d3.select('.loading-screen').remove();
+        const timeColorScale = d3.scaleThreshold()
+          .domain([5, 6, 7, 19, 20, 21]) // sunrise/sunset
+          .range(['#88acc1', '#95b8cc', '#a2c4d7', '#afd0e3', '#a2c4d7', '#95b8cc', '#88acc1']);
+        
+        const today = new Date();
+        const hours = today.getHours()
+
+        d3.select('body')
+          .transition()
+            .style("background-color", timeColorScale(hours))
+          
+        d3.select('.loading-screen').remove();        
       })
       .catch(response => {
         console.log(response.errors)
@@ -140,10 +151,6 @@ class Map extends Component {
       .scale(s)
       .translate(t);
 
-    const timeColorScale = d3.scaleThreshold()
-      .domain([5, 6, 7, 19, 20, 21]) // sunrise/sunset
-      .range(['#88acc1', '#95b8cc', '#a2c4d7', '#afd0e3', '#a2c4d7', '#95b8cc', '#88acc1']);
-
     g.selectAll('path')
       .data(seattleJson.features) // outline of seattle
       .enter()
@@ -151,10 +158,6 @@ class Map extends Component {
       .attr('fill', '#F0F5F4')
       .attr('d', path)
       .attr('stroke', 'black');
-    
-    d3.select('body')
-      .transition()
-        .style("background-color", timeColorScale(this.state.tfhour))
 
     var coordinates = this.state.dots.features.map(feature => feature.geometry.coordinates);
 
@@ -244,18 +247,10 @@ class Map extends Component {
     const offset = (time.length === 10) ? 1 : 0;
     const hour = time.substr(0, 5 - offset)
     const amOrPm = time.substr(9 - offset, 2)
-    let tfhour = 0;
-    if (amOrPm === "PM" && hour !== "12") {
-      tfhour = Number(hour) + 12;
-    } else if(amOrPm === "AM" && hour === "12") {
-      tfhour = 0;
-    } else {
-      tfhour = Number(hour);
-    }
 
     const day = date.toLocaleDateString('en-EN', {weekday: 'long'})
 
-    this.setState({ tfhour: tfhour, day: day })
+    this.setState({ day: day })
 
     const shortTime = hour + amOrPm;
     

@@ -1,28 +1,23 @@
 import React, {Component} from 'react';
 import * as d3 from 'd3';
-import axios from 'axios';
 import seattleJson from '../data/seattleJson'
-// import fakeAPI from '../data/fakeAPI'
-import './OverTime.css' //why?
-import neighborhoods from '../data/seattle-neighborhoods'
+import './Home.css'
 
-
-
-class Home extends Component { 
+class Map extends Component { 
   constructor(props) {
     super(props);
 
-    const today =  new Date();
     this.state = {
-      tfhour: today.getHours(),
+      tfhour: 0,
     }
   }
 
-  width = 800;
-  height = 750;
-
+  width = 400;
+  height = 700;
+  
   componentDidMount() {
     this.drawMap();
+    d3.select('.loading-screen').remove();
   }
 
   drawMap = () => {
@@ -35,14 +30,14 @@ class Home extends Component {
 
     var g = svg.append('g');
 
-    var projection = d3.geoAlbers()
+    var projection = d3.geoMercator()//.angle(130)
       .scale(1)
       .translate([0, 0]);
 
     var path = d3.geoPath()
       .projection(projection);
 
-    var b = path.bounds(seattleJson), // outline of seattle
+    var b = path.bounds(seattleJson),
     s = .95 / Math.max((b[1][0] - b[0][0]) / this.width, (b[1][1] - b[0][1]) / this.height),
     t = [(this.width - s * (b[1][0] + b[0][0])) / 2, (this.height - s * (b[1][1] + b[0][1])) / 2];
 
@@ -50,31 +45,44 @@ class Home extends Component {
       .scale(s)
       .translate(t);
 
+    const timeColorScale = d3.scaleThreshold()
+      .domain([5, 6, 7, 19, 20, 21]) // sunrise/sunset
+      .range(['#88acc1', '#95b8cc', '#a2c4d7', '#afd0e3', '#a2c4d7', '#95b8cc', '#88acc1']);
+
     g.selectAll('path')
       .data(seattleJson.features) // outline of seattle
       .enter()
       .append('path')
-      .attr('fill', '#F7FCE8')
-      .attr('d', path);
-
-    const timeColorScale = d3.scaleThreshold()
-      .domain([5, 6, 7, 19, 20, 21]) // sunrise/sunset
-      .range(['#62889e', '#88acc1', '#afd0e3', '#d7e7f1', '#afd0e3', '#88acc1', '#62889e']); //blues
-     
+      .attr('fill', '#F0F5F4')
+      .attr('d', path)
+      .attr('stroke', 'black');
+    
     d3.select('body')
-      .style("background-color", timeColorScale(this.state.tfhour))
-      
+      .transition()
+        .style("background-color", timeColorScale(this.state.tfhour))
   }
 
   render() {
     return (
-      <div className='map'>
-        <section className='left-side'></section>
-        <section className='seattle'></section>
-        <section className='right-side'></section>
+      <div className="homepage">
+        <div className="parent parent__flipped">
+          <div className='map'>
+            <section className="middle">
+              <section className='seattle'></section>
+            </section>
+            <section className='right-side'>
+              <h1>JUMP Bikes in Seattle</h1>
+            </section>
+          </div>
+        </div>
+          <div className="loading-screen d-flex justify-content-center">
+          <div className="spinner-border text-secondary" role="status">
+            <span className="sr-only">Loading...</span>
+          </div>
+        </div>
       </div>
     );
   }
 }
 
-export default Home;
+export default Map;

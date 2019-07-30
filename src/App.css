@@ -41,6 +41,14 @@ nav {
   position: relative;
 }
 
+.parent__flipped {
+  direction: rtl;
+}
+
+.parent__flipped h1 {
+  text-align: left;
+}
+
 .seattle {
   grid-column: 1 / 2;
 }

@@ -257,7 +257,7 @@ class Neighborhoods extends Component {
   render() {
     return (
       <div>
-        <div className="parent parent__neighborhood">
+        <div className="parent parent__flipped">
           <div className='map'>
             <section className="middle">
               <section className='seattle'></section>
