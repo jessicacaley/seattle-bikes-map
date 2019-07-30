@@ -187,24 +187,37 @@ class Neighborhoods extends Component {
       } 
     })
 
-    // const hoods = Object.keys(neighborhoodBikeCount)
-    // const averageDensity = {}
+    console.log(this.averageDensityPerNeighborhood)
 
-    // hoods.forEach(hood => {
-    //   averageDensity[hood] = this.neighborhoodTotals[hood] / this.numberOfDays;
-    // })
+    const hoods = Object.keys(neighborhoodBikeCount)
+    const comparedToAverage = {}
 
-    // console.log(averageDensity)
+    hoods.forEach(hood => {
+      comparedToAverage[hood] = neighborhoodBikeCount[hood] - this.averageDensityPerNeighborhood[hood];
+    })
+
+    // console.log(comparedToAverage)
+    const compToAverageValues = Object.values(comparedToAverage)
+
+    const maxDensity = Math.max(...compToAverageValues);
+    const minDensity = Math.min(...compToAverageValues);
+
+    // console.log(maxComp, minComp)
     
-    const densityValues = Object.values(neighborhoodBikeCount);
-
-    const maxDensity = Math.max(...densityValues);
-    const minDensity = Math.min(...densityValues);
-
-    // var colorScale = d3.scaleLinear().domain([0,112703512.412]).range(['beige', 'red']);
     var colorScale = d3.scaleLinear()
-      .domain([minDensity, maxDensity])
-      .range(['#fafcfa', '#333']);
+      .domain([minDensity, 0, maxDensity])
+      .range(['red', 'white' ,'green']);
+    
+    // //
+    // const densityValues = Object.values(neighborhoodBikeCount);
+
+    // const maxDensity = Math.max(...densityValues);
+    // const minDensity = Math.min(...densityValues);
+
+    // // var colorScale = d3.scaleLinear().domain([0,112703512.412]).range(['beige', 'red']);
+    // var colorScale = d3.scaleLinear()
+    //   .domain([minDensity, maxDensity])
+    //   .range(['#fafcfa', '#333']);
 
     const that = this;
 
@@ -213,7 +226,7 @@ class Neighborhoods extends Component {
       .data(neighborhoods.features) // outline of seattle
       .enter()
       .append('path')
-      .attr('fill', (d, i) => colorScale(neighborhoodBikeCount[d.id]))
+      .attr('fill', (d, i) => colorScale(comparedToAverage[d.id]))
       .attr('stroke', 'grey')      
       .attr('stroke-width', 1)
       .attr('d', path)
