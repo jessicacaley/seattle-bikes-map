@@ -100,6 +100,8 @@ class Map extends Component {
           date: this.datify(response.data.features[0].properties.time),
           time: time,
         });
+
+        d3.select('.loading-screen').remove();
       })
       .catch(error => {
         console.log(error)
@@ -413,56 +415,47 @@ class Map extends Component {
 
   render() {
     return (
-      <div className="parent">
-        <div className='map'>
-          {/* <section className='left-side'>
-              
-            <form>
-              <input 
-                // className="form-control"
-                onChange={this.onAddressChange}
-                value={this.state.address}
-                name="address"
-                id="address"
-                type="text"
-                placeholder="Address" />
-              <input type="submit"
-                className="btn btn-secondary btn-sm" 
-                onClick={this.onFormSubmit} />
-            </form>
-          </section> */}
-          <section className="middle">
-            <section className='seattle'></section>
-          </section>
-          <section className='right-side'>
-            <div className="controls">
-              <div className="controls-progress">
-                <ProgressBar min={this.startTime} max={this.endTime} now={this.state.time} className="custom-progress-bar" variant="secondary" />
+      <div>
+        <div className="parent">
+          <div className='map'>
+            <section className="middle">
+              <section className='seattle'></section>
+            </section>
+            <section className='right-side'>
+              <div className="controls">
+                <div className="controls-progress">
+                  <ProgressBar min={this.startTime} max={this.endTime} now={this.state.time} className="custom-progress-bar" variant="secondary" />
+                </div>
+                <div className="controls-button">
+                  <button className={`btn play-stop ${this.state.control === 'play' ? "visible" : "invisible"}`} onClick={this.iterateOverTime}>&#9658;</button>
+                  <button className={`btn play-stop ${this.state.control === 'stop' ? "visible" : "invisible"}`} onClick={this.stop}>&#9724;</button>
+                  <button className={`btn play-stop ${this.state.control === 'reset' ? "visible" : "invisible"}`} onClick={this.drawStaticMap}>&#10226;</button>
+                </div>
               </div>
-              <div className="controls-button">
-                <button className={`btn play-stop ${this.state.control === 'play' ? "visible" : "invisible"}`} onClick={this.iterateOverTime}>&#9658;</button>
-                <button className={`btn play-stop ${this.state.control === 'stop' ? "visible" : "invisible"}`} onClick={this.stop}>&#9724;</button>
-                <button className={`btn play-stop ${this.state.control === 'reset' ? "visible" : "invisible"}`} onClick={this.drawStaticMap}>&#10226;</button>
+              <h1> {this.state.date ? this.state.date.split(' ')[0] : ''} </h1>
+              <h1> {this.state.date ? this.state.date.split(' ')[1] : ''} </h1>
+              <h1> {this.state.date ? this.state.date.split(' ')[2] : ''} </h1>
+              <div className="btn-group buttons" role="group">
+                <button className="btn btn-secondary" onClick={this.clickDotsButton}>Dots</button>
+                <button className="btn btn-secondary" onClick={this.clickDensityButton}>Density</button>
               </div>
-            </div>
-            <h1> {this.state.date ? this.state.date.split(' ')[0] : ''} </h1>
-            <h1> {this.state.date ? this.state.date.split(' ')[1] : ''} </h1>
-            <h1> {this.state.date ? this.state.date.split(' ')[2] : ''} </h1>
-            <div className="btn-group buttons" role="group">
-              <button className="btn btn-secondary" onClick={this.clickDotsButton}>Dots</button>
-              <button className="btn btn-secondary" onClick={this.clickDensityButton}>Density</button>
-            </div>
-            <div className={`btn-group buttons show-or-hide ${this.state.singleBike ? 'visible' : 'invisible'}`}>
-              <button className={`btn btn-sm ${!this.state.showDetails ? 'visible' : 'invisible'}`} onClick={this.revealDetails}>Show Bike Details</button>
-              <button className={`btn btn-sm ${this.state.showDetails ? 'visible' : 'invisible'}`} onClick={this.hideDetails}>Hide Bike Details</button>
-            </div>
-            <div className={`current-bike ${this.state.showDetails && this.state.singleBike ? 'visible' : 'invisible'}`}>
-              <ul className="bike-info"></ul>
-            </div>
-            {/* <div className={`placeholder current-bike `}>
-              <p>click to display bike details</p>
-            </div> */}
-          </section>
+              <div className={`btn-group buttons show-or-hide ${this.state.singleBike ? 'visible' : 'invisible'}`}>
+                <button className={`btn btn-sm ${!this.state.showDetails ? 'visible' : 'invisible'}`} onClick={this.revealDetails}>Show Bike Details</button>
+                <button className={`btn btn-sm ${this.state.showDetails ? 'visible' : 'invisible'}`} onClick={this.hideDetails}>Hide Bike Details</button>
+              </div>
+              <div className={`current-bike ${this.state.showDetails && this.state.singleBike ? 'visible' : 'invisible'}`}>
+                <ul className="bike-info"></ul>
+              </div>
+              {/* <div className={`placeholder current-bike `}>
+                <p>click to display bike details</p>
+              </div> */}
+            </section>
+          </div>
+        </div>
+        <div className="loading-screen d-flex justify-content-center">
+          <div class="spinner-border text-secondary" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
         </div>
       </div>
     );

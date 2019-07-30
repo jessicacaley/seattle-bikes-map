@@ -79,6 +79,8 @@ class Map extends Component {
           dots: this.geoJsonify(response.data),
           date: this.datify(response.data.last_updated)
         })
+
+        d3.select('.loading-screen').remove();
       })
       .catch(response => {
         console.log(response.errors)
@@ -312,27 +314,34 @@ class Map extends Component {
 
   render() {
     return (
-      <div className="parent">
-        <div className='map'>
-          <section className="middle">
-            <section className='seattle'></section>
-          </section>
-          <section className='right-side'>
-            <h1> {this.state.date ? this.state.date.split(' ')[0] : ''} </h1>
-            <h1> {this.state.date ? this.state.date.split(' ')[1] : ''} </h1>
-            <h1> {this.state.date ? this.state.date.split(' ')[2] : ''} </h1>
-            <div className="btn-group buttons" role="group">
-              <button className="btn btn-secondary" onClick={this.clickDotsButton}>Dots</button>
-              <button className="btn btn-secondary" onClick={this.clickDensityButton}>Density</button>
-            </div>
-            <div className={`current-bike current-bike__current ${this.state.showDetails ? 'visible' : 'invisible'}`}>
-              <ul className="bike-info bike-info__current">
-                <li>name: </li>
-                <li>id: </li>
-                <li>battery: </li>
-              </ul>
-            </div>
-          </section>
+      <div>
+        <div className="parent">
+          <div className='map'>
+            <section className="middle">
+              <section className='seattle'></section>
+            </section>
+            <section className='right-side'>
+              <h1> {this.state.date ? this.state.date.split(' ')[0] : ''} </h1>
+              <h1> {this.state.date ? this.state.date.split(' ')[1] : ''} </h1>
+              <h1> {this.state.date ? this.state.date.split(' ')[2] : ''} </h1>
+              <div className="btn-group buttons" role="group">
+                <button className="btn btn-secondary" onClick={this.clickDotsButton}>Dots</button>
+                <button className="btn btn-secondary" onClick={this.clickDensityButton}>Density</button>
+              </div>
+              <div className={`current-bike current-bike__current ${this.state.showDetails ? 'visible' : 'invisible'}`}>
+                <ul className="bike-info bike-info__current">
+                  <li>name: </li>
+                  <li>id: </li>
+                  <li>battery: </li>
+                </ul>
+              </div>
+            </section>
+          </div>
+        </div>
+          <div className="loading-screen d-flex justify-content-center">
+          <div class="spinner-border text-secondary" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
         </div>
       </div>
     );
