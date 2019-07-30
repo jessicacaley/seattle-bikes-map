@@ -13,7 +13,7 @@ class Map extends Component {
     super(props);
 
     d3.select('body')
-      .style("background-color", 'rgb(136, 172, 193)')
+      .style("background-color", '#afd0e3')
 
     this.state = {
       dots: null,
@@ -157,7 +157,7 @@ class Map extends Component {
       .enter()
       .append('path')
       // .attr('fill', '#e9ecef')
-      .attr('fill', '#F0F5F4')
+      .attr('fill', '#fafcfa')
       .attr('d', path)
       .attr('stroke', 'black');
     
@@ -448,12 +448,9 @@ class Map extends Component {
                 <button className={`btn btn-sm ${!this.state.showDetails ? 'visible' : 'invisible'}`} onClick={this.revealDetails}>Show Bike Details</button>
                 <button className={`btn btn-sm ${this.state.showDetails ? 'visible' : 'invisible'}`} onClick={this.hideDetails}>Hide Bike Details</button>
               </div>
-              <div className={`current-bike ${this.state.showDetails && this.state.singleBike ? 'visible' : 'invisible'}`}>
+              <div className={`current-bike current-bike__overtime ${this.state.showDetails && this.state.singleBike ? 'visible' : 'invisible'}`}>
                 <ul className="bike-info"></ul>
               </div>
-              {/* <div className={`placeholder current-bike `}>
-                <p>click to display bike details</p>
-              </div> */}
             </section>
           </div>
         </div>

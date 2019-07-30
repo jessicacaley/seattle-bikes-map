@@ -9,7 +9,8 @@ body {
 }
 
 h1 {
-  color: #F0F5F4;
+  /* color: #F0F5F4; */
+  color:  rgb(250, 252, 250);
   text-align: right;
   font-weight: bold;
 }
@@ -81,17 +82,13 @@ nav {
 }
 
 .buttons {
-  /* float: right; */
-  /* display: flex; */
-  /* flex-direction: row; */
-  /* justify-content: right; */
   padding-top: 5px;
   display: block;
 }
 
 .navbar {
   padding: .25rem;
-  border-bottom: solid grey 1px;
+  border-bottom: solid #6c757d 1px;
   width: 100%;
   /* text-align: center; */
 }
@@ -109,24 +106,31 @@ nav {
 }
 
 .current-bike {
-  /* border: #6c757d solid 3px; */
-  /* background-color: #6c757d; */
   background-color: rgb(108, 117, 125, .1);
   width: 200px;
   border-radius: 10px;
   margin-left: auto;
   margin-right: 10%;
-  margin-top: 25%;
+  margin-top: 15vh;
   height: auto;
   text-align: center;
   color: white;
   padding: 10px;
-  /* float: bottom; */
 }
 
 h2 {
   font-size: 1.5em;
   /* text-decoration: underline; */
+}
+
+h3 {
+  color: rgb(250, 252, 250);
+  background-color: #6c757d;
+  font-size: 3em;
+  text-align: center;
+  /* text-shadow: -2px 2px rgb(108, 117, 125); */
+  font-weight: bold;
+  padding: 5px;
 }
 
 .bike-info {
@@ -140,16 +144,20 @@ h2 {
 }
 
 .show-or-hide > * {
-  color: grey;
+  color: #6c757d;
+}
+
+.show-or-hide > *.hover {
+  color: white;
 }
 
 .loading-screen {
-  background-color: rgb(136, 172, 193);
+  background-color: #afd0e3;
   width: 100%;
   height: 95vh;
   position: absolute;
   top: 30;
   left: 0;
   z-index: 10;
-  padding-top: 25%;
+  padding-top: 40vh;
 }

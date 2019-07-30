@@ -18,7 +18,7 @@ class Neighborhoods extends Component {
     super(props);
 
     d3.select('body')
-      .style("background-color", 'rgb(136, 172, 193)')
+      .style("background-color", '#afd0e3')
 
     this.state = {
       dots: null,
@@ -196,7 +196,7 @@ class Neighborhoods extends Component {
     // var colorScale = d3.scaleLinear().domain([0,112703512.412]).range(['beige', 'red']);
     var colorScale = d3.scaleLinear()
       .domain([minDensity, maxDensity])
-      .range(['white', 'blue']);
+      .range(['#fafcfa', '#333']);
 
     const that = this;
 
@@ -224,6 +224,15 @@ class Neighborhoods extends Component {
     var coordinates = this.state.dots.features.map(feature => {
       return feature.geometry.coordinates;
     })
+
+    const timeColorScale = d3.scaleThreshold()
+      .domain([5, 6, 7, 19, 20, 21]) // sunrise/sunset
+      .range(['#88acc1', '#95b8cc', '#a2c4d7', '#afd0e3', '#a2c4d7', '#95b8cc', '#88acc1']);
+
+    d3.select('body')
+      .transition()
+        .style("background-color", timeColorScale(this.state.tfhour))
+
 
     this.setState({
       coordinates: coordinates,

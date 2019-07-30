@@ -12,7 +12,7 @@ class Map extends Component {
     super(props);
 
     d3.select('body')
-      .style("background-color", 'rgb(136, 172, 193)')
+      .style("background-color", '#afd0e3')
 
     this.state = {
       dots: null,
@@ -154,7 +154,7 @@ class Map extends Component {
       .data(seattleJson.features) // outline of seattle
       .enter()
       .append('path')
-      .attr('fill', '#F0F5F4')
+      .attr('fill', '#fafcfa')
       .attr('d', path)
       .attr('stroke', 'black');
 
