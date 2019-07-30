@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
 import * as d3 from 'd3';
+import axios from 'axios';
 import seattleJson from '../data/seattleJson'
 import neighborhoods from '../data/seattle-neighborhoods'
-import fakeAPI from '../data/fakeAPI'
+// import fakeAPI from '../data/fakeAPI'
 import d3Tip from "d3-tip"
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import './Neighborhoods.css'
@@ -31,53 +32,67 @@ class Neighborhoods extends Component {
   endTime = 434551; // Mon 7/29 midnight
 
   componentDidMount() {
-    var i = 0;
-    var intervalId = setInterval(() => {
-      if (i === (fakeAPI.length - 1)) clearInterval(intervalId);
-      console.log(`Rendering map #${i+1}/${fakeAPI.length}...`)
-      this.getPoints(i);
-      i++;
-    }, 1500);
-    d3.select('.loading-screen').remove();
+    this.drawStaticMap();
   }
 
   componentDidUpdate(previousProps, previousState) {
     if (this.state.dots !== previousState.dots) this.drawMap();
   }
 
-  // getPoints = (time) => {
-  //   axios.get(`https://jessicacaley.github.io/historical-bike-data/times/${time}.json`)
-  //     .then(response => {
-  //       this.setState({
-  //         dots: response.data,
-  //         date: this.datify(response.data.features[0].properties.time),
-  //         time: time,
-  //       });
-
-  //       d3.select('.loading-screen').remove();
-  //     })
-  //     .catch(error => {
-  //       console.log(error)
-  //       alert("Uh oh! Something went wrong - we couldn't get the data.")
-  //     })
-  // }
-
-  getPoints(i) {
-    const data = fakeAPI[i]
-    this.setState({
-      dots: data,
-      date: this.datify(data.features[0].properties.time),
-      i: i
-    });
+  drawStaticMap = () => {
+    this.getPoints(this.startTime);
+    this.setState({ control: 'play' })
   }
+
+  iterateOverTime = () => {
+    this.setState({control: 'stop'})
+
+    let time = this.startTime;
+    var intervalId = setInterval(() => {
+      if(time === this.endTime || this.state.control !== "stop" || this.state.singleBike) {
+        clearInterval(intervalId);
+        this.setState({ control: 'reset' })
+      }
+      this.getPoints(time);
+      // this.setState({ })
+      time++;
+    }, 100);
+  }
+
+  getPoints = (time) => {
+    axios.get(`https://jessicacaley.github.io/historical-bike-data/times/${time}.json`)
+      .then(response => {
+        this.setState({
+          dots: response.data,
+          date: this.datify(response.data.features[0].properties.time),
+          time: time,
+        });
+
+        d3.select('.loading-screen').remove();
+
+        return response.data;
+      })
+      .catch(error => {
+        console.log(error)
+        alert("Uh oh! Something went wrong - we couldn't get the data.")
+      })
+  }
+
+  // getPoints(i) {
+  //   const data = fakeAPI[i]
+  //   this.setState({
+  //     dots: data,
+  //     date: this.datify(data.features[0].properties.time),
+  //     i: i
+  //   });
+  // }
 
   drawMap() {
     const tip = d3Tip();
     // tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return d; });
 
-
     tip.attr("class", "d3-tip")
-      .html(d => { console.log(d); return d.properties.name; })
+      .html(d => { return d.properties.name; })
    
     d3.selectAll('svg').remove();
 
@@ -120,7 +135,7 @@ class Neighborhoods extends Component {
       if (feature.geometry.type === 'Polygon') {
         const hood = neighborhoods.features[i].geometry.coordinates[0];
 
-        const points = fakeAPI[this.state.i].features;
+        const points = this.state.dots.features;
         
         points.forEach(point => {
           if (d3.polygonContains(hood, point.geometry.coordinates)) {
@@ -134,7 +149,7 @@ class Neighborhoods extends Component {
           if (coordinate.length === 1) {
             const hood = coordinate[0];
 
-            const points = fakeAPI[this.state.i].features;
+            const points = this.state.dots.features;
             
             points.forEach(point => {
               if (d3.polygonContains(hood, point.geometry.coordinates)) {
@@ -150,7 +165,7 @@ class Neighborhoods extends Component {
             coordinate.forEach(section => {
               // const hood = set
 
-              const points = fakeAPI[this.state.i].features
+              const points = this.state.dots.features;
               
               points.forEach(point => {
                 if (d3.polygonContains(section, point.geometry.coordinates)) {
@@ -179,6 +194,8 @@ class Neighborhoods extends Component {
       .domain([minDensity, maxDensity])
       .range(['white', 'blue']);
 
+    const that = this;
+
     // Classic D3... Select non-existent elements, bind the data, append the elements, and apply attributes
     g.selectAll( 'path' )
       .data(neighborhoods.features) // outline of seattle
@@ -190,8 +207,10 @@ class Neighborhoods extends Component {
       .attr('d', path)
       .attr('name', (d) => d.id)
       .on('mouseover', function(d){
-        tip.show(d, this);
-        this.style['stroke-width'] = 3;
+        if (that.state.control !== 'stop') {
+          tip.show(d, this);
+          this.style['stroke-width'] = 3;
+        }
       })
       .on('mouseout', function(d){
         tip.hide(d, this);
@@ -208,6 +227,8 @@ class Neighborhoods extends Component {
       svg: svg
     });
   }
+
+  stop = () => this.setState({ control: 'reset' });
 
   datify = (secondsSinceEpoch) => {
     const date = new Date(secondsSinceEpoch * 1000);
@@ -249,7 +270,7 @@ class Neighborhoods extends Component {
                   <button className={`btn play-stop ${this.state.control === 'reset' ? "visible" : "invisible"}`} onClick={this.drawStaticMap}>&#10226;</button>
                 </div>
                 <div className="controls-progress">
-                  <ProgressBar min={this.startTime} max={this.endTime} now={this.state.time} className="custom-progress-bar" variant="secondary" />
+                  <ProgressBar min={this.startTime} max={this.endTime} now={this.state.time} className="custom-progress-bar custom-progress-bar__neighborhood" variant="secondary" />
                 </div>
               </div>
               <h1> {this.state.date ? this.state.date.split(' ')[0] : ''} </h1>
@@ -266,26 +287,12 @@ class Neighborhoods extends Component {
           </div>
         </div>
         <div className="loading-screen d-flex justify-content-center">
-          <div class="spinner-border text-secondary" role="status">
-            <span class="sr-only">Loading...</span>
+          <div className="spinner-border text-secondary" role="status">
+            <span className="sr-only">Loading...</span>
           </div>
         </div>
       </div>
     )
-    return (
-      <div>
-        <div className='map'>
-          <h1> {this.state.date} </h1>
-          <section className='seattle'></section>
-        </div>
-        <div className="loading-screen d-flex justify-content-center">
-          <div class="spinner-border text-secondary" role="status">
-            <span class="sr-only">Loading...</span>
-          </div>
-        </div>
-      </div>
-      
-    );
   }
 }
 

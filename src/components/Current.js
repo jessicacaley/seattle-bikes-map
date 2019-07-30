@@ -339,8 +339,8 @@ class Map extends Component {
           </div>
         </div>
           <div className="loading-screen d-flex justify-content-center">
-          <div class="spinner-border text-secondary" role="status">
-            <span class="sr-only">Loading...</span>
+          <div className="spinner-border text-secondary" role="status">
+            <span className="sr-only">Loading...</span>
           </div>
         </div>
       </div>
