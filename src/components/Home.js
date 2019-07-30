@@ -7,6 +7,9 @@ class Map extends Component {
   constructor(props) {
     super(props);
 
+    d3.select('body')
+      .style("background-color", 'rgb(136, 172, 193)')
+
     this.state = {
       tfhour: 0,
     }
@@ -65,7 +68,7 @@ class Map extends Component {
   render() {
     return (
       <div className="homepage">
-        <div className="parent parent__flipped">
+        <div className="parent ">
           <div className='map'>
             <section className="middle">
               <section className='seattle'></section>

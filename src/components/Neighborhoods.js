@@ -16,6 +16,10 @@ import './Neighborhoods.css'
 class Neighborhoods extends Component { 
   constructor(props) {
     super(props);
+
+    d3.select('body')
+      .style("background-color", 'rgb(136, 172, 193)')
+
     this.state = {
       dots: null,
       date: null,

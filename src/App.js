@@ -10,7 +10,6 @@ import Header from './components/Header'
 function App() {
   return (
     <div className="App">
-      {/* <Header /> */}
       <Router basename={process.env.PUBLIC_URL}>
         <section className="page">
           <div className="navigation">
@@ -23,10 +22,10 @@ function App() {
                   <Link className="nav-link" to="/current/">Current</Link>
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link" to="/neighborhoods/">Neighborhoods</Link>
+                  <Link className="nav-link" to="/over-time/">Historical</Link>
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link" to="/over-time/">Historical</Link>
+                  <Link className="nav-link" to="/neighborhoods/">Neighborhoods</Link>
                 </li>
               </ul>
             </nav>
@@ -34,8 +33,8 @@ function App() {
           <div className="content">
             <Route exact path="/" component={Home} />
             <Route path="/current" component={Current} />
-            <Route path="/neighborhoods" component={Neighborhoods} />
             <Route path="/over-time" component={OverTime} />
+            <Route path="/neighborhoods" component={Neighborhoods} />
           </div>
         </section>
       </Router>

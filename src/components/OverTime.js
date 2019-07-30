@@ -11,6 +11,10 @@ import neighborhoods from '../data/seattle-neighborhoods'
 class Map extends Component { 
   constructor(props) {
     super(props);
+
+    d3.select('body')
+      .style("background-color", 'rgb(136, 172, 193)')
+
     this.state = {
       dots: null,
       date: null,
@@ -24,6 +28,8 @@ class Map extends Component {
       showDetails: true,
     };
   }
+
+  
 
   width = 400;
   height = 700;

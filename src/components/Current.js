@@ -11,6 +11,9 @@ class Map extends Component {
   constructor(props) {
     super(props);
 
+    d3.select('body')
+      .style("background-color", 'rgb(136, 172, 193)')
+
     this.state = {
       dots: null,
       date: null,
@@ -35,10 +38,6 @@ class Map extends Component {
     if (this.state.dots !== previousState.dots || this.state.mapType !== previousState.mapType) {  
       this.drawMap();
     }
-
-    // if (this.state.showDetails !== previousState.showDetails) {
-    //   this.drawMap();
-    // }
   }
 
   drawContours = (svg, coordinates, projection) => {
