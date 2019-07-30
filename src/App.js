@@ -11,7 +11,7 @@ function App() {
   return (
     <div className="App">
       {/* <Header /> */}
-      <Router>
+      <Router basename={process.env.PUBLIC_URL}>
         <section className="page">
           <div className="navigation">
             <nav className="navbar navbar-expand-sm justify-content-center">

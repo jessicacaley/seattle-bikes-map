@@ -1,5 +1,7 @@
 .App {
   text-align: center;
+  margin-right: 10%;
+  margin-left: 10%;
 }
 
 h1 {
@@ -19,4 +21,8 @@ a:hover {
 nav ul {
   list-style: none;
   margin-left: none;
+}
+
+.navbar {
+  padding: .25rem;
 }

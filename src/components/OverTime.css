@@ -26,7 +26,7 @@ body {
 
 .right-side {
   grid-column: 3 / 4;
-  padding-right: 100px;
+  /* padding-right: 100px; */
 }
 
 .invisible {
@@ -54,8 +54,17 @@ body {
 
 .controls {
   display: flex;
-  height: 50px;
+  /* height: 50px; */
   align-items: center;
   display: flex;
   flex-direction: row-reverse;
+}
+
+form {
+  text-align: left;
+}
+
+.buttons {
+  float: right;
+  padding-top: 5px;
 }

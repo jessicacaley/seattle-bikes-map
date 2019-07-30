@@ -23,13 +23,14 @@ class Map extends Component {
     };
   }
 
-  width = 500;
-  height = 750;
+  width = 400;
+  height = 700;
   startTime = 434383; // Mon 7/22 midnight
   endTime = 434551; // Mon 7/29 midnight
 
   componentDidMount() {
     this.drawStaticMap();
+    this.scrollToBottom();
   }
 
   componentDidUpdate(previousProps, previousState) {
@@ -119,7 +120,7 @@ class Map extends Component {
     var g = svg.append('g');
 
     // Create a unit projection.
-    var projection = d3.geoMercator()
+    var projection = d3.geoMercator()//.angle(130)
       .scale(1)
       .translate([0, 0]);
 
@@ -152,7 +153,8 @@ class Map extends Component {
       .attr('stroke', 'black');
     
     d3.select('body')
-      .style("background-color", timeColorScale(this.state.tfhour))
+      .transition()
+        .style("background-color", timeColorScale(this.state.tfhour))
 
     var coordinates = this.state.dots.features.map(feature => feature.geometry.coordinates);
 
@@ -178,14 +180,16 @@ class Map extends Component {
 
     const handleMouseOver = function handleMouseOver(d, i) {
       d3.select(this)
-        .attr('r', '8px')
-        .attr('stroke', 'black');
+        .transition().duration([200])
+          .attr('r', '8px')
+          .attr('stroke', 'black');
     }
 
     const handleMouseOut = function handleMouseOut(d, i) {
       d3.select(this)
-        .attr('r', '2px')
-        .attr('stroke', 'transparent');
+        .transition().duration([200])
+          .attr('r', '2px')
+          .attr('stroke', 'transparent');
     }
 
     const that = this;
@@ -193,15 +197,15 @@ class Map extends Component {
     const handleMouseClick = function handleMouseClick(d, i) {
       that.setState({ control: 'stop' });
 
-      d3.select(this);
+      // d3.select(this);
      
-      d3.select('#description').remove();
+      // d3.select('#description').remove();
 
-      svg.append('text')
-        .attr('id', 'description') // Create an id for text so we can select it later for removing on mouseout
-        .attr('x', () => 700)
-        .attr('y', () => 350)
-        .text(() => dots.features[i].properties.name);
+      // svg.append('text')
+      //   .attr('id', 'description') // Create an id for text so we can select it later for removing on mouseout
+      //   .attr('x', () => 700)
+      //   .attr('y', () => 350)
+      //   .text(() => dots.features[i].properties.name);
 
       that.followABike(this.getAttribute('name'));
 
@@ -224,7 +228,8 @@ class Map extends Component {
     }
 
     svg.selectAll('circle')
-      .data(coordinates).enter()
+      .data(coordinates)
+      .enter()
       .append('circle')
       .attr('cx', d => projection(d)[0])
       .attr('cy', d => projection(d)[1])
@@ -318,6 +323,8 @@ class Map extends Component {
 
   //08510 is a good example // 10329 for north // 10292
   singleBikeAnimation = (response) => {
+    d3.select('.progress-bar').style('width', '0%')
+
     this.setState({ singleBike: true, control: 'stop' })
     let time = this.startTime;
 
@@ -352,51 +359,57 @@ class Map extends Component {
       .catch(error => console.log(error))
   }
 
+  scrollToBottom = () => {
+    this.el.scrollIntoView({ behavior: 'smooth' });
+  }
+
   render() {
     return (
-      <div className='map'>
-        <section className='left-side'>
-          <form>
-            <input 
-              // className="form-control"
-              onChange={this.onAddressChange}
-              value={this.state.address}
-              name="address"
-              id="address"
-              type="text"
-              placeholder="Address" />
-            <input type="submit"
-              className="btn btn-secondary btn-sm" 
-              onClick={this.onFormSubmit} />
-          </form>
-          <div className="btn-toolbar justify-content-center" role="toolbar">
-            <div className="btn-group mr-2" role="group">
+      <div>
+        <div className='map'>
+          <section className='left-side'>
+              
+            <form>
+              <input 
+                // className="form-control"
+                onChange={this.onAddressChange}
+                value={this.state.address}
+                name="address"
+                id="address"
+                type="text"
+                placeholder="Address" />
+              <input type="submit"
+                className="btn btn-secondary btn-sm" 
+                onClick={this.onFormSubmit} />
+            </form>
+          </section>
+          <section className="middle">
+            
+            <section className='seattle'></section>
+          </section>
+          <section className='right-side'>
+            <div className="controls">
+              <div className="controls-progress">
+                <ProgressBar min={this.startTime} max={this.endTime} now={this.state.time} className="custom-progress-bar" variant="secondary" />
+              </div>
+              <div className="controls-button">
+                <button className={`btn play-stop ${this.state.control === 'play' ? "visible" : "invisible"}`} onClick={this.iterateOverTime}>&#9658;</button>
+                {/* <FontAwesomeIcon icon="play" /> figure this out later */}
+                {/* scrub bar? https://codepen.io/iamfiscus/pen/xbOyrE */}
+                <button className={`btn play-stop ${this.state.control === 'stop' ? "visible" : "invisible"}`} onClick={this.stop}>&#9724;</button>
+                <button className={`btn play-stop ${this.state.control === 'reset' ? "visible" : "invisible"}`} onClick={this.drawStaticMap}>&laquo;</button>
+              </div>
+            </div>
+            <h1> {this.state.date ? this.state.date.split(' ')[0] : ''} </h1>
+            <h1> {this.state.date ? this.state.date.split(' ')[1] : ''} </h1>
+            <h1> {this.state.date ? this.state.date.split(' ')[2] : ''} </h1>
+            <div className="btn-group buttons" data-toggle="buttons" role="group">
               <button className="btn btn-secondary" onClick={this.clickDotsButton}>Dots</button>
               <button className="btn btn-secondary" onClick={this.clickDensityButton}>Density</button>
             </div>
-          </div>
-        </section>
-        <section className="middle">
-          
-          <section className='seattle'></section>
-        </section>
-        <section className='right-side'>
-          <div className="controls">
-            <div className="controls-progress">
-              <ProgressBar min={this.startTime} max={this.endTime} now={this.state.time} className="custom-progress-bar" variant="secondary" />
-            </div>
-            <div className="controls-button">
-              <button className={`btn play-stop ${this.state.control === 'play' ? "visible" : "invisible"}`} onClick={this.iterateOverTime}>&#9658;</button>
-              {/* <FontAwesomeIcon icon="play" /> figure this out later */}
-              {/* scrub bar? https://codepen.io/iamfiscus/pen/xbOyrE */}
-              <button className={`btn play-stop ${this.state.control === 'stop' ? "visible" : "invisible"}`} onClick={this.stop}>&#9724;</button>
-              <button className={`btn play-stop ${this.state.control === 'reset' ? "visible" : "invisible"}`} onClick={this.drawStaticMap}>&laquo;</button>
-            </div>
-          </div>
-          <h1> {this.state.date ? this.state.date.split(' ')[0] : ''} </h1>
-          <h1> {this.state.date ? this.state.date.split(' ')[1] : ''} </h1>
-          <h1> {this.state.date ? this.state.date.split(' ')[2] : ''} </h1>
-        </section>
+          </section>
+        </div>
+        <div ref={el => { this.el = el; }} />
       </div>
     );
   }
