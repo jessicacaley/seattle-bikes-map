@@ -56,3 +56,11 @@
   top: 50%;
   left: 100%;
 }
+
+.parent__neighborhood {
+  direction: rtl;
+}
+
+.parent__neighborhood h1 {
+  text-align: left;
+}

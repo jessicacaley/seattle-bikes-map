@@ -4,6 +4,7 @@ import seattleJson from '../data/seattleJson'
 import neighborhoods from '../data/seattle-neighborhoods'
 import fakeAPI from '../data/fakeAPI'
 import d3Tip from "d3-tip"
+import ProgressBar from 'react-bootstrap/ProgressBar';
 import './Neighborhoods.css'
 
 
@@ -17,12 +18,17 @@ class Neighborhoods extends Component {
     this.state = {
       dots: null,
       date: null,
-      playButton: true,
+      control: 'play',
+      tfhour: 0,
+      time: 434383,
+      day: 22,
     };
   }
 
   width = 400;
   height = 700;
+  startTime = 434383; // Mon 7/22 midnight
+  endTime = 434551; // Mon 7/29 midnight
 
   componentDidMount() {
     var i = 0;
@@ -38,6 +44,23 @@ class Neighborhoods extends Component {
   componentDidUpdate(previousProps, previousState) {
     if (this.state.dots !== previousState.dots) this.drawMap();
   }
+
+  // getPoints = (time) => {
+  //   axios.get(`https://jessicacaley.github.io/historical-bike-data/times/${time}.json`)
+  //     .then(response => {
+  //       this.setState({
+  //         dots: response.data,
+  //         date: this.datify(response.data.features[0].properties.time),
+  //         time: time,
+  //       });
+
+  //       d3.select('.loading-screen').remove();
+  //     })
+  //     .catch(error => {
+  //       console.log(error)
+  //       alert("Uh oh! Something went wrong - we couldn't get the data.")
+  //     })
+  // }
 
   getPoints(i) {
     const data = fakeAPI[i]
@@ -188,10 +211,67 @@ class Neighborhoods extends Component {
 
   datify = (secondsSinceEpoch) => {
     const date = new Date(secondsSinceEpoch * 1000);
-    return `${date.toLocaleDateString()} / ${date.toLocaleTimeString('en-US')}`;
+    const time = date.toLocaleTimeString('en-US')
+    const offset = (time.length === 10) ? 1 : 0;
+    const hour = time.substr(0, 2 - offset)
+    const amOrPm = time.substr(9 - offset, 2)
+    let tfhour = 0;
+    if (amOrPm === "PM" && hour !== "12") {
+      tfhour = Number(hour) + 12;
+    } else if(amOrPm === "AM" && hour === "12") {
+      tfhour = 0;
+    } else {
+      tfhour = Number(hour);
+    }
+
+    const day = date.toLocaleDateString('en-EN', {weekday: 'long'})
+
+    this.setState({ tfhour: tfhour, day: day })
+
+    const shortTime = hour + amOrPm;
+    
+    return `${day} ${date.toLocaleDateString()} ${shortTime}`;
   }
 
   render() {
+    return (
+      <div>
+        <div className="parent parent__neighborhood">
+          <div className='map'>
+            <section className="middle">
+              <section className='seattle'></section>
+            </section>
+            <section className='right-side'>
+              <div className="controls">
+                <div className="controls-button">
+                  <button className={`btn play-stop ${this.state.control === 'play' ? "visible" : "invisible"}`} onClick={this.iterateOverTime}>&#9658;</button>
+                  <button className={`btn play-stop ${this.state.control === 'stop' ? "visible" : "invisible"}`} onClick={this.stop}>&#9724;</button>
+                  <button className={`btn play-stop ${this.state.control === 'reset' ? "visible" : "invisible"}`} onClick={this.drawStaticMap}>&#10226;</button>
+                </div>
+                <div className="controls-progress">
+                  <ProgressBar min={this.startTime} max={this.endTime} now={this.state.time} className="custom-progress-bar" variant="secondary" />
+                </div>
+              </div>
+              <h1> {this.state.date ? this.state.date.split(' ')[0] : ''} </h1>
+              <h1> {this.state.date ? this.state.date.split(' ')[1] : ''} </h1>
+              <h1> {this.state.date ? this.state.date.split(' ')[2] : ''} </h1>
+              <div className={`btn-group buttons show-or-hide ${this.state.singleBike ? 'visible' : 'invisible'}`}>
+                <button className={`btn btn-sm ${!this.state.showDetails ? 'visible' : 'invisible'}`} onClick={this.revealDetails}>Show Bike Details</button>
+                <button className={`btn btn-sm ${this.state.showDetails ? 'visible' : 'invisible'}`} onClick={this.hideDetails}>Hide Bike Details</button>
+              </div>
+              <div className={`current-bike ${this.state.showDetails && this.state.singleBike ? 'visible' : 'invisible'}`}>
+                <ul className="bike-info"></ul>
+              </div>
+            </section>
+          </div>
+        </div>
+        <div className="loading-screen d-flex justify-content-center">
+          <div class="spinner-border text-secondary" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+        </div>
+      </div>
+    )
     return (
       <div>
         <div className='map'>

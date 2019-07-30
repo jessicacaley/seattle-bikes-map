@@ -107,7 +107,6 @@ class Map extends Component {
         console.log(error)
         alert("Uh oh! Something went wrong - we couldn't get the data.")
       })
-    
   }
 
   drawMap = () => {
