@@ -78,7 +78,7 @@ class Map extends Component {
         // 4, 6, 7 is distorting, 10 (last with lines), 14, 16 1-17 big gap from 3 to 4
       );
 
-    var color = d3.scaleSequential(d3.interpolatePurples) // don't show density with same color as battery
+    var color = d3.scaleSequential(d3.interpolatePuOr) // don't show density with same color as battery
      .domain([0, .06]); // Points per square pixel.
     
     contours
@@ -87,7 +87,7 @@ class Map extends Component {
       .attr('d', d3.geoPath())
       .attr('opacity', '1')
       .attr('fill', d => color(d.value));
-  }
+    }
 
   getPoints = (time) => {
     this.setState({singleBike: false})
@@ -102,6 +102,7 @@ class Map extends Component {
       })
       .catch(error => {
         console.log(error)
+        alert("Uh oh! Something went wrong - we couldn't get the data.")
       })
     
   }
@@ -147,8 +148,8 @@ class Map extends Component {
       .data(seattleJson.features) // outline of seattle
       .enter()
       .append('path')
-      // .attr('fill', '#F7FCE8')
-      .attr('fill', '#e9ecef')
+      // .attr('fill', '#e9ecef')
+      .attr('fill', '#F0F5F4')
       .attr('d', path)
       .attr('stroke', 'black');
     
@@ -288,6 +289,10 @@ class Map extends Component {
     this.placeAddress(this.state.svg, this.state.projection);
   }
 
+  wheresThat = () => {
+
+  }
+
   placeAddress = (svg, projection) => {
     const address = this.state.address;
 
@@ -318,6 +323,7 @@ class Map extends Component {
       })
       .catch(error => {
         console.log(error)
+        alert("Uh oh! Something went wrong - we couldn't get the data.")
       })
   }
 
@@ -365,9 +371,9 @@ class Map extends Component {
 
   render() {
     return (
-      <div>
+      <div className="parent">
         <div className='map'>
-          <section className='left-side'>
+          {/* <section className='left-side'>
               
             <form>
               <input 
@@ -382,9 +388,8 @@ class Map extends Component {
                 className="btn btn-secondary btn-sm" 
                 onClick={this.onFormSubmit} />
             </form>
-          </section>
+          </section> */}
           <section className="middle">
-            
             <section className='seattle'></section>
           </section>
           <section className='right-side'>
@@ -394,8 +399,6 @@ class Map extends Component {
               </div>
               <div className="controls-button">
                 <button className={`btn play-stop ${this.state.control === 'play' ? "visible" : "invisible"}`} onClick={this.iterateOverTime}>&#9658;</button>
-                {/* <FontAwesomeIcon icon="play" /> figure this out later */}
-                {/* scrub bar? https://codepen.io/iamfiscus/pen/xbOyrE */}
                 <button className={`btn play-stop ${this.state.control === 'stop' ? "visible" : "invisible"}`} onClick={this.stop}>&#9724;</button>
                 <button className={`btn play-stop ${this.state.control === 'reset' ? "visible" : "invisible"}`} onClick={this.drawStaticMap}>&laquo;</button>
               </div>
