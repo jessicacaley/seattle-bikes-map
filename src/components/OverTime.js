@@ -20,6 +20,7 @@ class Map extends Component {
       tfhour: 0,
       time: 434383,
       day: 22,
+      singleBike: false
     };
   }
 
@@ -30,7 +31,6 @@ class Map extends Component {
 
   componentDidMount() {
     this.drawStaticMap();
-    this.scrollToBottom();
   }
 
   componentDidUpdate(previousProps, previousState) {
@@ -179,24 +179,47 @@ class Map extends Component {
     
     const dots = this.state.dots
 
+    // const that = this;
+
     const handleMouseOver = function handleMouseOver(d, i) {
+      // that.setState({ showDetails: true })
+
       d3.select(this)
         .transition().duration([200])
           .attr('r', '8px')
           .attr('stroke', 'black');
+        
+      console.log(`this: ${this.getAttribute('name')}`)
+      console.log(`d: ${d}`)
+      console.log(`i: ${i}`)
+      
+      d3.select('.bike-info')
+        .append('text')
+        .html(() => `
+          <li>name: ${this.getAttribute('name')}</li>
+          <li>id: ${this.getAttribute('id')}</li>
+          <li className="bike-info__battery">battery: ${this.getAttribute('battery')}%</li>
+        `);
     }
 
     const handleMouseOut = function handleMouseOut(d, i) {
+      // that.setState({ showDetails: false })
+
+      radius = that.state.singleBike ? '8px' : '2px'
+
       d3.select(this)
         .transition().duration([200])
-          .attr('r', '2px')
+          .attr('r', radius)
           .attr('stroke', 'transparent');
+
+      d3.select('.bike-info')
+        .html(() => '')
     }
 
     const that = this;
 
     const handleMouseClick = function handleMouseClick(d, i) {
-      that.setState({ control: 'stop' });
+      that.setState({ control: 'stop', bikeName: this.getAttribute('name'), bikeId: this.getAttribute('id') });
 
       // d3.select(this);
      
@@ -237,11 +260,16 @@ class Map extends Component {
       .attr('r', radius)
       .attr('stroke', stroke)
       .attr('stroke-width', '.5')
+      .attr('battery', (d, i) => { 
+        const percentage = parseInt(dots.features[i].properties.jump_ebike_battery_level.slice(0, -1))
+        return percentage
+      })
       .attr('fill', (d, i) => { 
         const percentage = parseInt(dots.features[i].properties.jump_ebike_battery_level.slice(0, -1))
         return circleColorScale(percentage) 
       })
       .attr('name', (d, i) => dots.features[i].properties.name)
+      .attr('id', (d, i) => dots.features[i].properties.bike_id)
       .on('mouseover', this.state.control === 'stop' ? '' : handleMouseOver)
       .on('mouseout', this.state.control === 'stop' ? '' : handleMouseOut)
       .on('click', this.state.control === 'stop' ? '' : handleMouseClick);
@@ -329,14 +357,14 @@ class Map extends Component {
 
   //08510 is a good example // 10329 for north // 10292
   singleBikeAnimation = (response) => {
+    console.log(response)
+
     d3.select('.progress-bar').style('width', '0%')
 
     this.setState({ singleBike: true, control: 'stop' })
     let time = this.startTime;
 
     var intervalId2 = setInterval(() => {
-      console.log(this.state.day)
-
       if (time === this.endTime || this.state.control !== 'stop') {
         clearInterval(intervalId2);
         this.setState({ control: 'reset' });
@@ -349,10 +377,24 @@ class Map extends Component {
         "features": features
       }
 
+      const battery = features[0] ? features[0].properties.jump_ebike_battery_level : 'n/a'
+
+      d3.select('.bike-info')
+        .html('')
+
+      d3.select('.bike-info')
+        .append('text')
+        .html(() => `
+          <li>name: ${this.state.bikeName}</li>
+          <li>id: ${this.state.bikeId}</li>
+          <li className=".bike-info__battery">battery: ${this.state.battery}</li>
+        `);
+
       this.setState({
         dots: dots,
         date: this.datify(time * 3600),
-        time: time
+        time: time,
+        battery: battery
       });
 
       time++;
@@ -365,8 +407,12 @@ class Map extends Component {
       .catch(error => console.log(error))
   }
 
-  scrollToBottom = () => {
-    this.el.scrollIntoView({ behavior: 'smooth' });
+  revealDetails = () => {
+    this.setState({ showDetails: true })
+  }
+
+  hideDetails = () => {
+    this.setState({ showDetails: false })
   }
 
   render() {
@@ -406,13 +452,22 @@ class Map extends Component {
             <h1> {this.state.date ? this.state.date.split(' ')[0] : ''} </h1>
             <h1> {this.state.date ? this.state.date.split(' ')[1] : ''} </h1>
             <h1> {this.state.date ? this.state.date.split(' ')[2] : ''} </h1>
-            <div className="btn-group buttons" data-toggle="buttons" role="group">
+            <div className="btn-group buttons" role="group">
               <button className="btn btn-secondary" onClick={this.clickDotsButton}>Dots</button>
               <button className="btn btn-secondary" onClick={this.clickDensityButton}>Density</button>
             </div>
+            <div className={`btn-group buttons show-or-hide ${this.state.singleBike ? 'visible' : 'invisible'}`}>
+              <button className={`btn btn-sm ${!this.state.showDetails ? 'visible' : 'invisible'}`} onClick={this.revealDetails}>Show Details</button>
+              <button className={`btn btn-sm ${this.state.showDetails ? 'visible' : 'invisible'}`} onClick={this.hideDetails}>Hide Details</button>
+            </div>
+            <div className={`current-bike ${this.state.showDetails && this.state.singleBike ? 'visible' : 'invisible'}`}>
+              <ul className="bike-info"></ul>
+            </div>
+            {/* <div className={`placeholder current-bike `}>
+              <p>click to display bike details</p>
+            </div> */}
           </section>
         </div>
-        <div ref={el => { this.el = el; }} />
       </div>
     );
   }

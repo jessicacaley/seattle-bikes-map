@@ -1,36 +1,42 @@
 import React, {Component} from 'react';
 import * as d3 from 'd3';
 import axios from 'axios';
+// import FontAwesomeIcon from 'FontAwesomeIcon'; figure out this later
 import seattleJson from '../data/seattleJson'
-import jumpApiCache from '../data/jumpApiCache'
-import limeApi from '../data/limeApi'
+import './OverTime.css'
+import neighborhoods from '../data/seattle-neighborhoods'
+
 
 class Map extends Component { 
-  _isMounted = false;
-
   constructor(props) {
     super(props);
     this.state = {
       dots: null,
-      date: null
+      date: null,
+      mapType: 'dots',
+      address: "",
+      tfhour: 0,
+      time: 434383,
+      day: 22,
     };
   }
 
-  componentDidMount() {
-    this._isMounted = true;
+  width = 400;
+  height = 700;
+  startTime = 434383; // Mon 7/22 midnight
+  endTime = 434551; // Mon 7/29 midnight
 
-    this.getPoints('axios');
+  componentDidMount() {
+    this.getPoints();
   }
 
   componentDidUpdate(previousProps, previousState) {
-    if (this.state.dots !== previousState.dots) this.drawMap();
+    if (this.state.dots !== previousState.dots || this.state.mapType !== previousState.mapType) {  
+      this.drawMap();
+    }
   }
 
-  componentWillUnmount() {
-    this._isMounted = false;
-  }
-
-  drawContours(svg, coordinates, projection) {
+  drawContours = (svg, coordinates, projection) => {
     const data = coordinates.map(set => {
       return {
         'x': set[0],
@@ -38,109 +44,41 @@ class Map extends Component {
       }
     })
 
-    var width = 400;
-    var height = 750;
-
     var density = svg.append('g');
     
     var contours = density
-    .selectAll( 'path' )
-    .data(d3.contourDensity()
-      .x(d => projection([d.x, d.y])[0])
-      .y(d => projection([d.x, d.y])[1])
-      .size([width, height])
-      .bandwidth(4)(data)
-      // 4, 7, 10,  1-17 big gap from 3 to 4
-    );
+      .selectAll('path')
+      .data(d3.contourDensity()
+        .x(d => projection([d.x, d.y])[0])
+        .y(d => projection([d.x, d.y])[1])
+        .size([this.width, this.height])
+        .bandwidth(5)(data)
+        // 4, 6, 7 is distorting, 10 (last with lines), 14, 16 1-17 big gap from 3 to 4
+      );
+
+    var color = d3.scaleSequential(d3.interpolatePuOr) // don't show density with same color as battery
+     .domain([0, .06]); // Points per square pixel.
     
     contours
       .enter()
       .append('path')
       .attr('d', d3.geoPath())
-      .attr('fill', 'black')
-      .attr('opacity', '0.1');
-  }
+      .attr('opacity', '1')
+      .attr('fill', d => color(d.value));
+    }
 
-  getPoints(from) {
-    if(from === 'axios') {
-      axios.get('https://sea.jumpbikes.com/opendata/free_bike_status.json')
+  getPoints = () => {
+    axios.get('https://sea.jumpbikes.com/opendata/free_bike_status.json')
       .then(response => {
-        if (this._isMounted) {
-          this.setState({
-            dots: this.geoJsonify(response.data),
-            date: this.datify(response.data.last_updated)
-          })
-        }
+        this.setState({
+          dots: this.geoJsonify(response.data),
+          date: this.datify(response.data.last_updated)
+        })
       })
       .catch(response => {
         console.log(response.errors)
+        alert("Whoops!")
       })
-    } else if (from === 'test') {
-      this.setState({
-        dots: this.geoJsonify(jumpApiCache),
-        date: this.datify(jumpApiCache.last_updated)
-      });
-    } else if (from === 'lime') {
-      // so far, i've only gotten lime to return a concentrated cluster...
-      this.setState({ dots: limeApi });
-    }
-  }
-
-  drawMap() {
-    var width = 400;
-    var height = 750;
-
-    // Create SVG
-    var svg = d3.select('.seattle')
-      .append('svg')
-      .attr('width', width)
-      .attr('height', height);
-
-    // Append empty placeholder g element to the SVG
-    // g will contain geometry elements
-    var g = svg.append('g');
-
-    // Create a unit projection.
-    var projection = d3.geoAlbers()
-      .scale(1)
-      .translate([0, 0]);
-
-    // Create a path generator.
-    var path = d3.geoPath()
-      .projection(projection);
-
-    // Compute the bounds of a feature of interest, then derive scale & translate.
-    var b = path.bounds(seattleJson), // outline of seattle
-    s = .95 / Math.max((b[1][0] - b[0][0]) / width, (b[1][1] - b[0][1]) / height),
-    t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];
-
-    // Update the projection to use computed scale & translate.
-    projection
-      .scale(s)
-      .translate(t);
-
-    // Classic D3... Select non-existent elements, bind the data, append the elements, and apply attributes
-    g.selectAll('path')
-      .data(seattleJson.features)
-      .enter()
-      .append('path')
-      .attr('fill', 'rgba(230, 230, 230, 1)')
-      .attr('stroke', '#333')
-      .attr('d', path);
-
-    const coordinates = this.state.dots.features.map(feature => {
-      return feature.geometry.coordinates;
-    })
-
-    svg.selectAll('circle')
-      .data(coordinates).enter()
-      .append('circle')
-      .attr('cx', d => projection(d)[0])
-      .attr('cy', d => projection(d)[1])
-      .attr('r', '2px')
-      .attr('fill', 'lightgrey');
-
-    this.drawContours(svg, coordinates, projection);
   }
 
   geoJsonify(response_data) {
@@ -169,17 +107,196 @@ class Map extends Component {
 
     return collection
   }
-  
-  datify(secondsSinceEpoch) {
+
+  drawMap = () => {
+    d3.selectAll('svg').remove();
+
+    var svg = d3.select('.seattle')
+      .append('svg')
+      .attr('width', this.width)
+      .attr('height', this.height);
+
+    var g = svg.append('g');
+
+    var projection = d3.geoMercator()//.angle(130)
+      .scale(1)
+      .translate([0, 0]);
+
+    var path = d3.geoPath()
+      .projection(projection);
+
+    var b = path.bounds(seattleJson),
+    s = .95 / Math.max((b[1][0] - b[0][0]) / this.width, (b[1][1] - b[0][1]) / this.height),
+    t = [(this.width - s * (b[1][0] + b[0][0])) / 2, (this.height - s * (b[1][1] + b[0][1])) / 2];
+
+    projection
+      .scale(s)
+      .translate(t);
+
+    const timeColorScale = d3.scaleThreshold()
+      .domain([5, 6, 7, 19, 20, 21]) // sunrise/sunset
+      .range(['#88acc1', '#95b8cc', '#a2c4d7', '#afd0e3', '#a2c4d7', '#95b8cc', '#88acc1']);
+
+    g.selectAll('path')
+      .data(seattleJson.features) // outline of seattle
+      .enter()
+      .append('path')
+      .attr('fill', '#F0F5F4')
+      .attr('d', path)
+      .attr('stroke', 'black');
+    
+    d3.select('body')
+      .transition()
+        .style("background-color", timeColorScale(this.state.tfhour))
+
+    var coordinates = this.state.dots.features.map(feature => feature.geometry.coordinates);
+
+    this.setState({
+      coordinates: coordinates,
+      projection: projection,
+      svg: svg
+    });
+    
+    if(this.state.mapType === 'density') {
+      this.drawContours(svg, coordinates, projection);
+    } else {
+      this.drawDots(svg, coordinates, projection);
+    }
+  }
+
+  drawDots = (svg, coordinates, projection) => {
+    const circleColorScale = d3.scaleLinear()
+      .domain([0,100])
+      .range(['#ff1612', '#12ff22']); // red to green
+    
+    const dots = this.state.dots
+
+    const handleMouseOver = function handleMouseOver(d, i) {
+      d3.select(this)
+        .transition().duration([200])
+          .attr('r', '8px')
+          .attr('stroke', 'black');
+    }
+
+    const handleMouseOut = function handleMouseOut(d, i) {
+      d3.select(this)
+        .transition().duration([200])
+          .attr('r', '2px')
+          .attr('stroke', 'transparent');
+    }
+
+    let radius = '2.5px';
+    let stroke = 'transparent';
+
+    svg.selectAll('circle')
+      .data(coordinates)
+      .enter()
+      .append('circle')
+      .attr('cx', d => projection(d)[0])
+      .attr('cy', d => projection(d)[1])
+      .attr('r', radius)
+      .attr('stroke', stroke)
+      .attr('stroke-width', '.5')
+      .attr('fill', (d, i) => { 
+        const percentage = parseInt(dots.features[i].properties.jump_ebike_battery_level.slice(0, -1))
+        return circleColorScale(percentage) 
+      })
+      .attr('name', (d, i) => dots.features[i].properties.name)
+      .on('mouseover', this.state.control === 'stop' ? '' : handleMouseOver)
+      .on('mouseout', this.state.control === 'stop' ? '' : handleMouseOut)
+  }
+ 
+  datify = (secondsSinceEpoch) => {
     const date = new Date(secondsSinceEpoch * 1000);
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString('en-US');
+    const time = date.toLocaleTimeString('en-US')
+    const offset = (time.length === 10) ? 1 : 0;
+    const hour = time.substr(0, 5 - offset)
+    const amOrPm = time.substr(9 - offset, 2)
+    let tfhour = 0;
+    if (amOrPm === "PM" && hour !== "12") {
+      tfhour = Number(hour) + 12;
+    } else if(amOrPm === "AM" && hour === "12") {
+      tfhour = 0;
+    } else {
+      tfhour = Number(hour);
+    }
+
+    const day = date.toLocaleDateString('en-EN', {weekday: 'long'})
+
+    this.setState({ tfhour: tfhour, day: day })
+
+    const shortTime = hour + amOrPm;
+    
+    return `${day} ${date.toLocaleDateString()} ${shortTime}`;
+  }
+
+  clickDotsButton = () => this.setState({ mapType: 'dots' })
+
+  clickDensityButton = () => this.setState({ mapType: 'density' })
+
+  onAddressChange = (event) => {
+    console.log(`Address Field updated ${event.target.value}`);
+    this.setState({
+      address: event.target.value,
+    });
+  }
+
+  onFormSubmit = (event) => {
+    event.preventDefault();
+    this.placeAddress(this.state.svg, this.state.projection);
+  }
+
+  placeAddress = (svg, projection) => {
+    const address = this.state.address;
+
+    const params = {
+      key: "294f5da8a3f72c",
+      q: address + " Seattle",
+      format: "json"
+    };
+
+    axios.get('https://us1.locationiq.com/v1/search.php', { params: params })
+      .then(response => {
+        const coordinates = [[response.data[0].lon, response.data[0].lat]];
+
+        var address = svg.append('g');
+        
+        address
+          .selectAll('circle')
+          .data(coordinates).enter()
+          .append('circle')
+          .attr('cx', (d) => { 
+            return projection(d)[0] 
+          })
+          .attr('cy', (d) => projection(d)[1])
+          .attr('r', '7px')
+          .attr('fill', 'transparent')
+          .attr('stroke', 'black')
+          .attr('stroke-width', 2)
+      })
+      .catch(error => {
+        console.log(error)
+        alert("Uh oh! Something went wrong - we couldn't get the data.")
+      })
   }
 
   render() {
     return (
-      <div className='map'>
-        <h1> {this.state.date} </h1>
-        <section className='seattle'></section>
+      <div className="parent">
+        <div className='map'>
+          <section className="middle">
+            <section className='seattle'></section>
+          </section>
+          <section className='right-side'>
+            <h1> {this.state.date ? this.state.date.split(' ')[0] : ''} </h1>
+            <h1> {this.state.date ? this.state.date.split(' ')[1] : ''} </h1>
+            <h1> {this.state.date ? this.state.date.split(' ')[2] : ''} </h1>
+            <div className="btn-group buttons" role="group">
+              <button className="btn btn-secondary" onClick={this.clickDotsButton}>Dots</button>
+              <button className="btn btn-secondary" onClick={this.clickDensityButton}>Density</button>
+            </div>
+          </section>
+        </div>
       </div>
     );
   }

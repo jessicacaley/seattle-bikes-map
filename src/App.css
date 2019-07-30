@@ -4,9 +4,19 @@
   margin-left: 25%;
 }
 
+body {
+  background-color: #88acc1;
+}
+
 h1 {
-  color: white;
+  color: #F0F5F4;
+  text-align: right;
   font-weight: bold;
+}
+
+form {
+  padding: 10px;
+  text-align: left;
 }
 
 a {
@@ -14,7 +24,7 @@ a {
 }
 
 a:hover {
-  color: grey;
+  color: #6c757d;
   /* font-weight: bold; */
 }
 
@@ -27,9 +37,99 @@ nav {
   align-self: center;
 }
 
+.parent {
+  position: relative;
+}
+
+.seattle {
+  grid-column: 1 / 2;
+}
+
+.right-side {
+  grid-column: 2 / 3;
+  margin-top: 10px;
+  width: 300px;
+  text-align: right;
+}
+
+.invisible {
+  display: none !important;
+}
+
+.play-stop {
+  color: grey;
+  font-size: 1.2em;
+  float: left;
+  font-weight: bold;
+}
+
+.play-stop:hover {
+  color: grey;
+}
+
+.play-stop:active {
+  color: white;
+}
+
+.buttons {
+  /* float: right; */
+  /* display: flex; */
+  /* flex-direction: row; */
+  /* justify-content: right; */
+  padding-top: 5px;
+  display: block;
+}
+
 .navbar {
   padding: .25rem;
   border-bottom: solid grey 1px;
   width: 100%;
   /* text-align: center; */
+}
+
+.map {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  height: 350px;
+  width: 700px;
+  position: absolute;
+  top: 50vh;
+  left: 50%;
+  margin-left: -350px;
+  margin-top: -375px;
+}
+
+.current-bike {
+  /* border: #6c757d solid 3px; */
+  /* background-color: #6c757d; */
+  background-color: rgb(108, 117, 125, .1);
+  width: 200px;
+  border-radius: 10px;
+  margin-left: auto;
+  /* margin-right: auto; */
+  /* margin-top: 5%; */
+  height: auto;
+  text-align: center;
+  color: white;
+  padding: 10px;
+  /* float: bottom; */
+}
+
+h2 {
+  font-size: 1.5em;
+  /* text-decoration: underline; */
+}
+
+.bike-info {
+  text-align: left;
+  margin: 0;
+}
+
+.placeholder {
+  padding: 20px 30px;
+  color: rgb(256, 256, 256, .5);
+}
+
+.show-or-hide > * {
+  color: grey;
 }

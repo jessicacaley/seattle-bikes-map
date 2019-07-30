@@ -20,13 +20,13 @@ function App() {
                   <Link className="nav-link" to="/">Home</Link>
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link" to="/current/">Current</Link> {/* Map */}
+                  <Link className="nav-link" to="/current/">Current</Link>
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link" to="/neighborhoods/">Neighborhoods</Link> {/* Map 5 */}
+                  <Link className="nav-link" to="/neighborhoods/">Neighborhoods</Link>
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link" to="/over-time/">Historical</Link> {/* Map 7 */}
+                  <Link className="nav-link" to="/over-time/">Historical</Link>
                 </li>
               </ul>
             </nav>

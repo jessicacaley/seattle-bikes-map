@@ -1,7 +1,4 @@
-.map {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-}
+
 /* 
 .left-side {
   grid-columns: 0 / 1;
