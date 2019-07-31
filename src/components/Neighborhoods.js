@@ -99,10 +99,10 @@ class Neighborhoods extends Component {
   drawMap() {
 
     if(this.state.neighborhood) {
-      d3.select('.bike-info')
+      d3.select('.neighborhood-info')
         .html('')
 
-      d3.select('.bike-info')
+      d3.select('.neighborhood-info')
         .append('text')
         .html(() => `
           <li>neighborhood: <b>${this.state.neighborhood.properties.name}</b></li>
@@ -342,10 +342,10 @@ class Neighborhoods extends Component {
       .on('click', function(d) {
         that.setState({ neighborhood: d });
 
-        d3.select('.bike-info')
+        d3.select('.neighborhood-info')
           .html('');
 
-        d3.select('.bike-info')
+        d3.select('.neighborhood-info')
           .append('text')
           .html(() => `
             <li>neighborhood: <b>${d.properties.name}</b></li>
@@ -435,8 +435,8 @@ class Neighborhoods extends Component {
                 <button className={`btn btn-sm ${!this.state.showDetails ? 'visible' : 'invisible'}`} onClick={this.revealDetails}>Show Neighborhood Details</button>
                 <button className={`btn btn-sm ${this.state.showDetails ? 'visible' : 'invisible'}`} onClick={this.hideDetails}>Hide Neighborhood Details</button>
               </div>
-              <div className={`current-bike ${this.state.showDetails ? 'visible' : 'invisible'}`}>
-                <ul className="bike-info">
+              <div className={`current-neighborhood ${this.state.showDetails ? 'visible' : 'invisible'}`}>
+                <ul className="neighborhood-info">
                 </ul>
               </div>
             </section>
