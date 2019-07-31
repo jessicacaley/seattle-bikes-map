@@ -33,10 +33,12 @@ class Neighborhoods extends Component {
   height = 700;
   startTime = 434383; // Mon 7/22 midnight
   endTime = 434551; // Mon 7/29 midnight
-  overallMin = -0.9694559913247786;
-  overallMax = 2.44897959183674;
-  // overallMin = 0;
-  // overallMax = 0;
+  // overallMin = -0.9694559913247786;
+  // overallMax = 2.44897959183674;
+  overallMin = 0;
+  overallMax = 0.000010910152128112334;
+  totalNumOfBikes = {"Seattle:Ballard:Loyal Heights":4857,"Seattle:Ballard:Adams":24213,"Seattle:Ballard:Whittier Heights":1502,"Seattle:Ballard:West Woodland":10230,"Seattle:Ballard:Sunset Hill":10606,"Seattle:University District:":12974,"Seattle:Queen Anne:East Queen Anne":3471,"Seattle:Queen Anne:West Queen Anne":3710,"Seattle:Queen Anne:Lower Queen Anne":7559,"Seattle:Queen Anne:North Queen Anne":5969,"Seattle:Cascade:Westlake":1712,"Seattle:Cascade:Eastlake":4409,"Seattle:Cascade:South Lake Union":8209,"Seattle:Magnolia:Lawton Park":5471,"Seattle:Magnolia:Briarcliff":2393,"Seattle:Magnolia:Southeast Magnolia":1243,"Seattle:Central Area:Madrona":2723,"Seattle:Central Area:Harrison - Denny-Blaine":2652,"Seattle:Central Area:Minor":2884,"Seattle:Central Area:Leschi":5150,"Seattle:Central Area:Mann":1257,"Seattle:Central Area:Atlantic":5563,"Seattle:Downtown:Pike-Market":3279,"Seattle:Downtown:Belltown":11484,"Seattle:Downtown:International District":4835,"Seattle:Downtown:Central Business District":9526,"Seattle:Downtown:First Hill":2490,"Seattle:Downtown:Yesler Terrace":981,"Seattle:Downtown:Pioneer Square":8461,"Seattle:Interbay:":9864,"Seattle:West Seattle:Seaview":1383,"Seattle:West Seattle:Gatewood":1061,"Seattle:West Seattle:Arbor Heights":1315,"Seattle:West Seattle:Alki":8514,"Seattle:West Seattle:North Admiral":3584,"Seattle:West Seattle:Fairmount Park":658,"Seattle:West Seattle:Genesee":526,"Seattle:West Seattle:Fauntleroy":2697,"Seattle:Beacon Hill:North Beacon Hill":2757,"Seattle:Beacon Hill:Mid-Beacon Hill":2794,"Seattle:Beacon Hill:South Beacon Hill":601,"Seattle:Beacon Hill:Holly Park":977,"Seattle:Rainier Valley:Brighton":3077,"Seattle:Rainier Valley:Dunlap":3235,"Seattle:Rainier Valley:Rainier Beach":1394,"Seattle:Rainier Valley:Rainier View":157,"Seattle:Rainier Valley:Mount Baker":7226,"Seattle:Rainier Valley:Columbia City":4682,"Seattle:Delridge:Highland Park":730,"Seattle:Delridge:North Delridge":2019,"Seattle:Delridge:Riverview":864,"Seattle:Delridge:High Point":1376,"Seattle:Delridge:South Delridge":525,"Seattle:Delridge:Roxhill":245,"Seattle:Seward Park:":3564,"Seattle:Capitol Hill:Portage Bay":1575,"Seattle:Capitol Hill:Montlake":3739,"Seattle:Capitol Hill:Madison Park":5843,"Seattle:Capitol Hill:Broadway":5533,"Seattle:Capitol Hill:Stevens":3076,"Seattle:Lake City:Victory Heights":356,"Seattle:Lake City:Matthews Beach":1271,"Seattle:Lake City:Meadowbrook":345,"Seattle:Lake City:Olympic Hills":1371,"Seattle:Lake City:Cedar Park":837,"Seattle:Northgate:Haller Lake":443,"Seattle:Northgate:Pinehurst":992,"Seattle:Northgate:North College Park":2490,"Seattle:Northgate:Maple Leaf":1416,"Woodinville:Woodinville Heights:":0,"Woodinville:West Wellington:":0,"Seattle:Phinney Ridge:":3271,"Seattle:Wallingford:":7924,"Seattle:Fremont:":11668,"Seattle:Green Lake:":4638,"Seattle:View Ridge:":2161,"Seattle:Ravenna:":8103,"Seattle:Sand Point:":2995,"Seattle:Bryant:":2247,"Seattle:Windermere:":2223,"Seattle:Laurelhurst:":1865,"Seattle:Roosevelt:":1998,"Seattle:Georgetown:":3723,"Seattle:South Park:":1881,"Seattle:Harbor Island:":1280,"Seattle:Wedgwood:":594,"Seattle:Industrial District:":32013,"Seattle:Broadview:":390,"Seattle:Bitter Lake:":492,"Seattle:North Beach - Blue Ridge:":1536,"Seattle:Crown Hill:":654,"Seattle:Greenwood:":3197}
+  totalAvgNumOfBikes = {"Seattle:Ballard:Loyal Heights":28.7396449704142,"Seattle:Ballard:Adams":143.27218934911244,"Seattle:Ballard:Whittier Heights":8.887573964497042,"Seattle:Ballard:West Woodland":60.532544378698226,"Seattle:Ballard:Sunset Hill":62.75739644970414,"Seattle:University District:":76.76923076923077,"Seattle:Queen Anne:East Queen Anne":20.53846153846154,"Seattle:Queen Anne:West Queen Anne":21.952662721893493,"Seattle:Queen Anne:Lower Queen Anne":44.72781065088758,"Seattle:Queen Anne:North Queen Anne":35.319526627218934,"Seattle:Cascade:Westlake":10.1301775147929,"Seattle:Cascade:Eastlake":26.088757396449704,"Seattle:Cascade:South Lake Union":48.57396449704142,"Seattle:Magnolia:Lawton Park":32.37278106508876,"Seattle:Magnolia:Briarcliff":14.159763313609467,"Seattle:Magnolia:Southeast Magnolia":7.355029585798817,"Seattle:Central Area:Madrona":16.11242603550296,"Seattle:Central Area:Harrison - Denny-Blaine":15.692307692307692,"Seattle:Central Area:Minor":17.06508875739645,"Seattle:Central Area:Leschi":30.473372781065088,"Seattle:Central Area:Mann":7.437869822485207,"Seattle:Central Area:Atlantic":32.917159763313606,"Seattle:Downtown:Pike-Market":19.402366863905325,"Seattle:Downtown:Belltown":67.95266272189349,"Seattle:Downtown:International District":28.609467455621303,"Seattle:Downtown:Central Business District":56.366863905325445,"Seattle:Downtown:First Hill":14.733727810650887,"Seattle:Downtown:Yesler Terrace":5.804733727810651,"Seattle:Downtown:Pioneer Square":50.06508875739645,"Seattle:Interbay:":58.366863905325445,"Seattle:West Seattle:Seaview":8.183431952662723,"Seattle:West Seattle:Gatewood":6.27810650887574,"Seattle:West Seattle:Arbor Heights":7.781065088757397,"Seattle:West Seattle:Alki":50.37869822485207,"Seattle:West Seattle:North Admiral":21.207100591715978,"Seattle:West Seattle:Fairmount Park":3.893491124260355,"Seattle:West Seattle:Genesee":3.1124260355029585,"Seattle:West Seattle:Fauntleroy":15.958579881656805,"Seattle:Beacon Hill:North Beacon Hill":16.31360946745562,"Seattle:Beacon Hill:Mid-Beacon Hill":16.532544378698226,"Seattle:Beacon Hill:South Beacon Hill":3.5562130177514795,"Seattle:Beacon Hill:Holly Park":5.781065088757397,"Seattle:Rainier Valley:Brighton":18.207100591715978,"Seattle:Rainier Valley:Dunlap":19.142011834319526,"Seattle:Rainier Valley:Rainier Beach":8.248520710059172,"Seattle:Rainier Valley:Rainier View":0.9289940828402367,"Seattle:Rainier Valley:Mount Baker":42.75739644970414,"Seattle:Rainier Valley:Columbia City":27.70414201183432,"Seattle:Delridge:Highland Park":4.319526627218935,"Seattle:Delridge:North Delridge":11.946745562130177,"Seattle:Delridge:Riverview":5.112426035502959,"Seattle:Delridge:High Point":8.142011834319527,"Seattle:Delridge:South Delridge":3.106508875739645,"Seattle:Delridge:Roxhill":1.4497041420118344,"Seattle:Seward Park:":21.088757396449704,"Seattle:Capitol Hill:Portage Bay":9.319526627218934,"Seattle:Capitol Hill:Montlake":22.124260355029588,"Seattle:Capitol Hill:Madison Park":34.57396449704142,"Seattle:Capitol Hill:Broadway":32.739644970414204,"Seattle:Capitol Hill:Stevens":18.201183431952664,"Seattle:Lake City:Victory Heights":2.106508875739645,"Seattle:Lake City:Matthews Beach":7.520710059171598,"Seattle:Lake City:Meadowbrook":2.0414201183431953,"Seattle:Lake City:Olympic Hills":8.112426035502958,"Seattle:Lake City:Cedar Park":4.952662721893491,"Seattle:Northgate:Haller Lake":2.621301775147929,"Seattle:Northgate:Pinehurst":5.8698224852071,"Seattle:Northgate:North College Park":14.733727810650887,"Seattle:Northgate:Maple Leaf":8.378698224852071,"Woodinville:Woodinville Heights:":0,"Woodinville:West Wellington:":0,"Seattle:Phinney Ridge:":19.355029585798817,"Seattle:Wallingford:":46.887573964497044,"Seattle:Fremont:":69.0414201183432,"Seattle:Green Lake:":27.443786982248522,"Seattle:View Ridge:":12.78698224852071,"Seattle:Ravenna:":47.946745562130175,"Seattle:Sand Point:":17.72189349112426,"Seattle:Bryant:":13.29585798816568,"Seattle:Windermere:":13.153846153846153,"Seattle:Laurelhurst:":11.035502958579881,"Seattle:Roosevelt:":11.822485207100591,"Seattle:Georgetown:":22.02958579881657,"Seattle:South Park:":11.1301775147929,"Seattle:Harbor Island:":7.57396449704142,"Seattle:Wedgwood:":3.514792899408284,"Seattle:Industrial District:":189.42603550295857,"Seattle:Broadview:":2.3076923076923075,"Seattle:Bitter Lake:":2.911242603550296,"Seattle:North Beach - Blue Ridge:":9.088757396449704,"Seattle:Crown Hill:":3.8698224852071004,"Seattle:Greenwood:":18.91715976331361}
 
   componentDidMount() {
     this.drawStaticMap();
@@ -96,10 +98,18 @@ class Neighborhoods extends Component {
 
   drawMap() {
     const tip = d3Tip();
-    // tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return d; });
 
     tip.attr("class", "d3-tip")
-      .html(d => { return d.properties.name; })
+      .html((d) => {
+        return d.properties.name
+        // (
+        //   <div>
+        //     <p>{d.properties.name}</p>
+        //     <p>{d.properties.number}</p>
+        //     <p>{d.properties.average}</p>
+        //   </div>
+        // );
+      })
    
     d3.selectAll('svg').remove();
 
@@ -134,7 +144,8 @@ class Neighborhoods extends Component {
       .scale(s)
       .translate(t);
 
-    let neighborhoodBikeCount = {}
+    let bikeDensity = {}
+    let numOfBikes = {}
 
     neighborhoods.features.forEach((feature, i) => {
       let bikeCount = 0
@@ -150,7 +161,8 @@ class Neighborhoods extends Component {
           }
         })
 
-        neighborhoodBikeCount[feature.id] = bikeCount / feature.properties.area;
+        bikeDensity[feature.id] = bikeCount / feature.properties.area;
+        numOfBikes[feature.id] = bikeCount;
       } else {
         feature.geometry.coordinates.forEach(coordinate => {
           if (coordinate.length === 1) {
@@ -163,10 +175,15 @@ class Neighborhoods extends Component {
                 bikeCount += 1;
               }
             })
-            if (neighborhoodBikeCount[feature.id]) {
-              neighborhoodBikeCount[feature.id] += bikeCount / feature.properties.area;
+            if (bikeDensity[feature.id]) {
+              bikeDensity[feature.id] += bikeCount / feature.properties.area;
             } else {
-              neighborhoodBikeCount[feature.id] = bikeCount / feature.properties.area;
+              bikeDensity[feature.id] = bikeCount / feature.properties.area;
+            }
+            if (numOfBikes[feature.id]) {
+              numOfBikes[feature.id] += bikeCount;
+            } else {
+              numOfBikes[feature.id] = bikeCount;
             }
           } else {
             coordinate.forEach(section => {
@@ -180,58 +197,96 @@ class Neighborhoods extends Component {
                 }
               })
 
-              if (neighborhoodBikeCount[feature.id]) {
-                neighborhoodBikeCount[feature.id] += bikeCount / feature.properties.area;
+              
+
+              if (bikeDensity[feature.id]) {
+                bikeDensity[feature.id] += bikeCount / feature.properties.area;
               } else {
-                neighborhoodBikeCount[feature.id] = bikeCount / feature.properties.area;
+                bikeDensity[feature.id] = bikeCount / feature.properties.area;
+              }
+
+              if (numOfBikes[feature.id]) {
+                numOfBikes[feature.id] += bikeCount;
+              } else {
+                numOfBikes[feature.id] = bikeCount;
               }
             })
           }
         })
-      } 
-    })
-
-    // console.log(this.averageDensityPerNeighborhood)
-
-    const hoods = Object.keys(neighborhoodBikeCount)
-    const comparedToAverage = {}
-
-    hoods.forEach(hood => {
-      if (neighborhoodBikeCount[hood]) {
-        comparedToAverage[hood] = ((neighborhoodBikeCount[hood] - this.averageDensityPerNeighborhood[hood]) / this.averageDensityPerNeighborhood[hood]);
-      } else {
-        comparedToAverage[hood] = 0;
       }
     })
 
-    console.log(comparedToAverage)
-    const compToAverageValues = Object.values(comparedToAverage)
+    // console.log(numOfBikes);
 
-    // const maxDensity = Math.max(...compToAverageValues);
-    // const minDensity = Math.min(...compToAverageValues);
+    // console.log(this.averageDensityPerNeighborhood)
+
+    const hoods = Object.keys(bikeDensity);
+    // const hoods = Object.keys(numOfBikes);
+
+    // hoods.forEach(hood => {
+      // if (this.totalNumOfBikes[hood]) {
+      //   this.totalNumOfBikes[hood] += numOfBikes[hood];
+      // } else {
+        // this.totalNumOfBikes[hood] -= numOfBikes[hood];
+      // }
+      // this.totalAvgNumOfBikes[hood] = this.totalNumOfBikes[hood] / 169;
+    // })
+
+    // console.log(this.totalAvgNumOfBikes)
+
+    // const comparedToAverage = {}
+
+    // hoods.forEach(hood => {
+    //   if (bikeDensity[hood]) {
+    //     comparedToAverage[hood] = ((bikeDensity[hood] - this.averageDensityPerNeighborhood[hood]) / this.averageDensityPerNeighborhood[hood]);
+    //   } else {
+    //     comparedToAverage[hood] = 0;
+    //   }
+    // })
+
+
+    // let percentageChange = {}
+    // hoods.forEach(hood => {
+    //   if (this.totalAvgNumOfBikes[hood]) {
+    //     percentageChange[hood] = ((this.totalAvgNumOfBikes[hood] - numOfBikes[hood]) / this.totalAvgNumOfBikes[hood]) * 100;
+    //   } else {
+    //     percentageChange[hood] = 0;
+    //   }
+    // })
+
+
+    const bikeDensityValues = Object.values(bikeDensity)
+
+    const maxDensity = Math.max(...bikeDensityValues);
+    const minDensity = Math.min(...bikeDensityValues);
+
+    // const maxDensity = Math.max(...percentageChangeValues);
+    // const minDensity = Math.min(...percentageChangeValues);
+
 
     // if (maxDensity > this.overallMax) {
     //   this.overallMax = maxDensity;
     // }
-
     // if (minDensity < this.overallMin) {
     //   this.overallMin = minDensity;
     // }
 
-    console.log(`max: ${this.overallMax} min: ${this.overallMin}`)
-    // console.log(maxDensity, minDensity)
-    
-    var colorScale = d3.scaleLinear()
-      // .domain([minDensity, 0, maxDensity])
-      // .domain([-1, 0, 1])
-      .domain([this.overallMin, 0, this.overallMax])
-      .range(['red', '#fafcfa' ,'green']);
-    
-    // //
-    // const densityValues = Object.values(neighborhoodBikeCount);
+    // const densityValues = Object.values(bikeDensity);
 
     // const maxDensity = Math.max(...densityValues);
     // const minDensity = Math.min(...densityValues);
+  
+    var colorScale = d3.scaleLinear()
+      .domain([this.overallMin, this.overallMax])
+      .range(['#fafcfa', 'orange'])
+    
+    // var colorScale = d3.scaleLog()
+    //   .domain([this.overallMin, this.overallMax])
+    //   .range(["hsl(62,100%,90%)", "hsl(228,30%,20%)"])
+    //   .interpolate(d3.interpolateHcl);
+    // //
+
+    
 
     // // var colorScale = d3.scaleLinear().domain([0,112703512.412]).range(['beige', 'red']);
     // var colorScale = d3.scaleLinear()
@@ -245,11 +300,14 @@ class Neighborhoods extends Component {
       .data(neighborhoods.features) // outline of seattle
       .enter()
       .append('path')
-      .attr('fill', (d, i) => colorScale(comparedToAverage[d.id]))
+      .attr('fill', (d, i) => colorScale(bikeDensity[d.id]))
       .attr('stroke', 'grey')      
       .attr('stroke-width', 1)
       .attr('d', path)
       .attr('name', (d) => d.id)
+      .attr('average', (d) => that.totalAvgNumOfBikes[d.id])
+      .attr('num', (d) => numOfBikes[d.id])
+      // .attr('change', (d) => percentageChange[d.id])
       .on('mouseover', function(d){
         if (that.state.control !== 'stop') {
           tip.show(d, this);
@@ -272,7 +330,6 @@ class Neighborhoods extends Component {
     d3.select('body')
       .transition()
         .style("background-color", timeColorScale(this.state.tfhour))
-
 
     this.setState({
       coordinates: coordinates,
@@ -317,13 +374,13 @@ class Neighborhoods extends Component {
             </section>
             <section className='right-side'>
               <div className="controls">
+                <div className="controls-progress">
+                  <ProgressBar min={this.startTime} max={this.endTime} now={this.state.time} className="custom-progress-bar custom-progress-bar__neighborhood" variant="secondary" />
+                </div>
                 <div className="controls-button">
                   <button className={`btn play-stop ${this.state.control === 'play' ? "visible" : "invisible"}`} onClick={this.iterateOverTime}>&#9658;</button>
                   <button className={`btn play-stop ${this.state.control === 'stop' ? "visible" : "invisible"}`} onClick={this.stop}>&#9724;</button>
                   <button className={`btn play-stop ${this.state.control === 'reset' ? "visible" : "invisible"}`} onClick={this.drawStaticMap}>&#10226;</button>
-                </div>
-                <div className="controls-progress">
-                  <ProgressBar min={this.startTime} max={this.endTime} now={this.state.time} className="custom-progress-bar custom-progress-bar__neighborhood" variant="secondary" />
                 </div>
               </div>
               <h1> {this.state.date ? this.state.date.split(' ')[0] : ''} </h1>
