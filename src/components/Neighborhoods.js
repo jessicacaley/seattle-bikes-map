@@ -33,8 +33,8 @@ class Neighborhoods extends Component {
   height = 700;
   startTime = 434383; // Mon 7/22 midnight
   endTime = 434551; // Mon 7/29 midnight
-  overallMin = -0.000001 //06 // 5 // 72772127699119;
-  overallMax = 0.000001 // 2 //630428806281596;
+  overallMin = -0.9694559913247786;
+  overallMax = 2.44897959183674;
   // overallMin = 0;
   // overallMax = 0;
 
@@ -198,7 +198,7 @@ class Neighborhoods extends Component {
 
     hoods.forEach(hood => {
       if (neighborhoodBikeCount[hood]) {
-        comparedToAverage[hood] = (neighborhoodBikeCount[hood] - this.averageDensityPerNeighborhood[hood]);
+        comparedToAverage[hood] = ((neighborhoodBikeCount[hood] - this.averageDensityPerNeighborhood[hood]) / this.averageDensityPerNeighborhood[hood]);
       } else {
         comparedToAverage[hood] = 0;
       }
@@ -207,8 +207,8 @@ class Neighborhoods extends Component {
     console.log(comparedToAverage)
     const compToAverageValues = Object.values(comparedToAverage)
 
-    const maxDensity = Math.max(...compToAverageValues);
-    const minDensity = Math.min(...compToAverageValues);
+    // const maxDensity = Math.max(...compToAverageValues);
+    // const minDensity = Math.min(...compToAverageValues);
 
     // if (maxDensity > this.overallMax) {
     //   this.overallMax = maxDensity;
@@ -218,7 +218,7 @@ class Neighborhoods extends Component {
     //   this.overallMin = minDensity;
     // }
 
-    // console.log(`max: ${this.overallMax} min: ${this.overallMin}`)
+    console.log(`max: ${this.overallMax} min: ${this.overallMin}`)
     // console.log(maxDensity, minDensity)
     
     var colorScale = d3.scaleLinear()
