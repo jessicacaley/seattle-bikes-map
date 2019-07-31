@@ -159,7 +159,7 @@ class Map extends Component {
       // .attr('fill', '#e9ecef')
       .attr('fill', '#fafcfa')
       .attr('d', path)
-      .attr('stroke', 'black');
+      .attr('stroke', 'grey');
     
     d3.select('body')
       .transition()

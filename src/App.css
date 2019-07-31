@@ -41,14 +41,14 @@ nav {
 .parent {
   position: relative;
 }
-
+/* 
 .parent__flipped {
   direction: rtl;
 }
 
 .parent__flipped h1 {
   text-align: left;
-}
+} */
 
 .seattle {
   grid-column: 1 / 2;
@@ -128,9 +128,18 @@ h3 {
   background-color: #6c757d;
   font-size: 3em;
   text-align: center;
-  /* text-shadow: -2px 2px rgb(108, 117, 125); */
   font-weight: bold;
   padding: 5px;
+  margin-top: 28vh;
+}
+
+h4 {
+  color: #6c757d;
+  font-weight: bold;
+  font-size: 1em;
+  padding-right: 5px;
+  text-align: right;
+  letter-spacing: 1px;
 }
 
 .bike-info {
@@ -145,6 +154,7 @@ h3 {
 
 .show-or-hide > * {
   color: #6c757d;
+  float: right;
 }
 
 .show-or-hide > *.hover {

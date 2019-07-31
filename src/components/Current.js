@@ -156,7 +156,7 @@ class Map extends Component {
       .append('path')
       .attr('fill', '#fafcfa')
       .attr('d', path)
-      .attr('stroke', 'black');
+      .attr('stroke', 'grey');
 
     var coordinates = this.state.dots.features.map(feature => feature.geometry.coordinates);
 

@@ -50,7 +50,7 @@ class Map extends Component {
       .append('path')
       .attr('fill', '#fafcfa')
       .attr('d', path)
-      .attr('stroke', 'black');
+      .attr('stroke', 'grey');
   }
 
   render() {
@@ -62,7 +62,9 @@ class Map extends Component {
               <section className='seattle'></section>
             </section>
             <section className='right-side'>
-              <h3>JUMP Bikes in Seattle</h3>
+              <h3>Mapping JUMP Bikes in Seattle</h3>
+              <h4>Ada Capstone Project</h4>
+              <h4>Jessica Homet</h4>
             </section>
           </div>
         </div>
