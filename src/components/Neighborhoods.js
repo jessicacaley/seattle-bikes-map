@@ -3,7 +3,6 @@ import * as d3 from 'd3';
 import axios from 'axios';
 import seattleJson from '../data/seattleJson'
 import neighborhoods from '../data/seattle-neighborhoods'
-// import fakeAPI from '../data/fakeAPI'
 import d3Tip from "d3-tip"
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import './Neighborhoods.css'
@@ -25,6 +24,7 @@ class Neighborhoods extends Component {
       tfhour: 0,
       time: 434383,
       day: 22,
+      showDetails: false,
     };
   }
 
@@ -97,6 +97,20 @@ class Neighborhoods extends Component {
   // }
 
   drawMap() {
+
+    if(this.state.neighborhood) {
+      d3.select('.bike-info')
+        .html('')
+
+      d3.select('.bike-info')
+        .append('text')
+        .html(() => `
+          <li>neighborhood: <b>${this.state.neighborhood.properties.name}</b></li>
+          <li>average # of bikes: <b>${Math.round(this.totalAvgNumOfBikes[this.state.neighborhood.id])}</b></li>
+          <li>current # of bikes: <b>${this.state.numOfBikes[this.state.neighborhood.id]}</b></li>
+        `);
+    }
+    
     const tip = d3Tip();
 
     tip.attr("class", "d3-tip")
@@ -216,7 +230,7 @@ class Neighborhoods extends Component {
       }
     })
 
-    // console.log(numOfBikes);
+    this.setState({ numOfBikes: numOfBikes })
 
     // console.log(this.averageDensityPerNeighborhood)
 
@@ -245,16 +259,16 @@ class Neighborhoods extends Component {
     // })
 
 
-    // let percentageChange = {}
-    // hoods.forEach(hood => {
-    //   if (this.totalAvgNumOfBikes[hood]) {
-    //     percentageChange[hood] = ((this.totalAvgNumOfBikes[hood] - numOfBikes[hood]) / this.totalAvgNumOfBikes[hood]) * 100;
-    //   } else {
-    //     percentageChange[hood] = 0;
-    //   }
-    // })
+    let percentageChange = {}
+    hoods.forEach(hood => {
+      if (this.totalAvgNumOfBikes[hood]) {
+        percentageChange[hood] = ((this.totalAvgNumOfBikes[hood] - numOfBikes[hood]) / this.totalAvgNumOfBikes[hood]) * 100;
+      } else {
+        percentageChange[hood] = 0;
+      }
+    })
 
-
+    console.log(this.state)
     const bikeDensityValues = Object.values(bikeDensity)
 
     const maxDensity = Math.max(...bikeDensityValues);
@@ -301,12 +315,19 @@ class Neighborhoods extends Component {
       .enter()
       .append('path')
       .attr('fill', (d, i) => colorScale(bikeDensity[d.id]))
-      .attr('stroke', 'grey')      
-      .attr('stroke-width', 1)
+      .attr('stroke', 'grey')     
+      .attr('stroke-width', 1) 
+      // .attr('stroke-width', function(d) {
+      //   if (that.state.neighborhood && d.id === that.state.neighborhood.id) {
+      //     return 3;
+      //   } else {
+      //     return 1;
+      //   }
+      // })
       .attr('d', path)
-      .attr('name', (d) => d.id)
-      .attr('average', (d) => that.totalAvgNumOfBikes[d.id])
-      .attr('num', (d) => numOfBikes[d.id])
+      // .attr('name', (d) => d.id)
+      // .attr('average', (d) => that.totalAvgNumOfBikes[d.id])
+      // .attr('num', (d) => numOfBikes[d.id])
       // .attr('change', (d) => percentageChange[d.id])
       .on('mouseover', function(d){
         if (that.state.control !== 'stop') {
@@ -317,7 +338,23 @@ class Neighborhoods extends Component {
       .on('mouseout', function(d){
         tip.hide(d, this);
         this.style['stroke-width'] = 1;
-      })      
+      })
+      .on('click', function(d) {
+        that.setState({ neighborhood: d });
+
+        d3.select('.bike-info')
+          .html('');
+
+        d3.select('.bike-info')
+          .append('text')
+          .html(() => `
+            <li>neighborhood: <b>${d.properties.name}</b></li>
+            <li>average # of bikes: <b>${Math.round(that.totalAvgNumOfBikes[d.id])}</b></li>
+            <li>current # of bikes: <b>${numOfBikes[d.id]}</b></li>
+          `);
+        // NOTE: Percentage change is wildly innaccurate here!
+        that.revealDetails();        
+      })
 
     var coordinates = this.state.dots.features.map(feature => {
       return feature.geometry.coordinates;
@@ -364,6 +401,14 @@ class Neighborhoods extends Component {
     return `${day} ${date.toLocaleDateString()} ${shortTime}`;
   }
 
+  revealDetails = () => {
+    if (!this.state.showDetails) this.setState({ showDetails: true });
+  }
+
+  hideDetails = () => {
+    if (this.state.showDetails) this.setState({ showDetails: false });
+  }
+
   render() {
     return (
       <div>
@@ -386,12 +431,13 @@ class Neighborhoods extends Component {
               <h1> {this.state.date ? this.state.date.split(' ')[0] : ''} </h1>
               <h1> {this.state.date ? this.state.date.split(' ')[1] : ''} </h1>
               <h1> {this.state.date ? this.state.date.split(' ')[2] : ''} </h1>
-              <div className={`btn-group buttons show-or-hide ${this.state.singleBike ? 'visible' : 'invisible'}`}>
-                <button className={`btn btn-sm ${!this.state.showDetails ? 'visible' : 'invisible'}`} onClick={this.revealDetails}>Show Bike Details</button>
-                <button className={`btn btn-sm ${this.state.showDetails ? 'visible' : 'invisible'}`} onClick={this.hideDetails}>Hide Bike Details</button>
+              <div className={`btn-group buttons show-or-hide ${this.state.neighborhood ? 'visible' : 'invisible'}`}>
+                <button className={`btn btn-sm ${!this.state.showDetails ? 'visible' : 'invisible'}`} onClick={this.revealDetails}>Show Neighborhood Details</button>
+                <button className={`btn btn-sm ${this.state.showDetails ? 'visible' : 'invisible'}`} onClick={this.hideDetails}>Hide Neighborhood Details</button>
               </div>
-              <div className={`current-bike ${this.state.showDetails && this.state.singleBike ? 'visible' : 'invisible'}`}>
-                <ul className="bike-info"></ul>
+              <div className={`current-bike ${this.state.showDetails ? 'visible' : 'invisible'}`}>
+                <ul className="bike-info">
+                </ul>
               </div>
             </section>
           </div>
